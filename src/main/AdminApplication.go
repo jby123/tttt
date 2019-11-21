@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/betacraft/yaag"
+	"github.com/betacraft/yaag/yaag"
 	"github.com/gin-gonic/gin"
 	"goAdmin/src/main/comm/cache"
 	"goAdmin/src/main/comm/config"
