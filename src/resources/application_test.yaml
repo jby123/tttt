@@ -1,0 +1,12 @@
+Cache:
+  NetWork: tcp
+  Host: 127.0.0.1
+  Post: 6379
+  Pwd:
+
+DB:
+  DriverName: com.mysql.jdbc.Driver
+  Url: jdbc:mysql://172.19.0.160:3306/open_platform_test?characterEncoding=UTF-8
+  Username: root
+  Password: 123456
+  Dialect: mysql
