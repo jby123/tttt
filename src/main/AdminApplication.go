@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/betacraft/yaag/yaag"
 	"github.com/gin-gonic/gin"
 	"goAdmin/src/main/comm/cache"
 	"goAdmin/src/main/comm/config"
@@ -36,16 +35,6 @@ func startAdminApplication() (app *gin.Engine) {
 
 	routers.RegisterRoute(app)
 
-	//api文档配置 IMPORTANT, init the middleware.
-	yaag.Init(&yaag.Config{
-		On:       true,
-		DocTitle: "goAdmin",
-		DocPath:   "/index.html",
-		BaseUrls: map[string]string{
-			"Production": "",
-			"Staging":    "",
-		},
-	})
 	//返回app
 	return app
 }
@@ -56,6 +45,3 @@ func main() {
 	}
 
 }
-
-
-
