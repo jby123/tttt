@@ -5,9 +5,9 @@ import (
 	"goAdmin/src/main/comm/cache"
 	"goAdmin/src/main/comm/config"
 	"goAdmin/src/main/comm/database"
-	"goAdmin/src/main/comm/middleware"
 	"goAdmin/src/main/comm/routers"
 	"goAdmin/src/main/model"
+	"goAdmin/src/main/utils"
 	"log"
 	"net/http"
 	"strconv"
@@ -15,14 +15,10 @@ import (
 
 func startAdminApplication() (app *gin.Engine) {
 	app = gin.New()
-
-	app.Use(gin.Logger())
-	app.Use(gin.Recovery())
-	app.Use(middleware.CorsHandler())
 	//初始化环境配置
-	config.InitCommConfig()
+	config.InitCommConfig(utils.DefaultDevelopmentRelativePath)
 	//初始化mysql
-	database.InitMysql(&config.DbConf)
+	database.InitMysql(config.Config.EnvConf.ActiveConf.Active, &config.DbConf)
 	//初始化redis
 	cache.InitRedis(&config.RedisConf)
 
@@ -30,11 +26,16 @@ func startAdminApplication() (app *gin.Engine) {
 	//如果模型表这里没有添加模型，单元测试会报错数据表不存在。
 	//因为单元测试结束，会删除数据表
 	database.GetDB().AutoMigrate(
-		&model.User{},
+		&model.SysUser{},
+		&model.SysLog{},
+		&model.SysDepartment{},
+		&model.SysRole{},
+		&model.SysMenu{},
+		&model.SysRoleMenu{},
+		&model.SysUserDept{},
+		&model.SysUserRole{},
 	)
-
 	routers.RegisterRoute(app)
-
 	//返回app
 	return app
 }

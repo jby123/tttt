@@ -6,7 +6,8 @@ Cache:
 
 DB:
   DriverName: com.mysql.jdbc.Driver
-  Url: jdbc:mysql://172.19.0.160:3306/open_platform_test?characterEncoding=UTF-8
+  Database: open_platform_test
+  Url: root:zjj930716.@/cool_admin?charset=utf8&parseTime=True&loc=Local
   Username: root
   Password: 123456
   Dialect: mysql

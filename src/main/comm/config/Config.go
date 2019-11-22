@@ -1,17 +1,19 @@
 package config
 
 import (
+	"fmt"
 	cache2 "goAdmin/src/main/comm/cache"
 	"goAdmin/src/main/comm/database"
+	"goAdmin/src/main/utils"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"os"
 )
-
 
 //总配置
 type Conf struct {
 	ServerConf Server `yaml:"Server"`
-	EnvConf    Iris `yaml:"Iris"`
+	EnvConf    Iris   `yaml:"Iris"`
 }
 
 //系统服务配置
@@ -19,10 +21,10 @@ type Server struct {
 	Port int `yaml:"Port"`
 }
 
-
 type Iris struct {
 	ActiveConf Profiles `yaml:"Profiles"`
 }
+
 //环境  dev/test/prod
 type Profiles struct {
 	Active string `yaml:"Active"`
@@ -39,37 +41,37 @@ var Path string
 
 var activePath string
 
-//默认环境
-var DefaultEnvActive string ="dev"
-
-func init() {
-	Path = "./src/resources/bootstrap.yaml"
+func PreInit(relativePath string) {
+	Path = relativePath + "/bootstrap.yaml"
 }
 
-func InitActivePath(activeEnv string) {
-	if len(activePath) <=0 {
-		activeEnv = DefaultEnvActive
+func InitActivePath(relativePath, activeEnv string) {
+	if len(activePath) <= 0 {
+		activeEnv = utils.DefaultDevelopmentEnv
 	}
-	activePath = "./src/resources/application_"+activeEnv+".yaml"
+	activePath = relativePath + "/application_" + activeEnv + ".yaml"
 
 }
-
 
 // 1.从配置文件中加载配置
-func InitCommConfig() error {
+func InitCommConfig(relativePath string) error {
+	PreInit(relativePath)
 	content, err := ioutil.ReadFile(Path)
-	if err == nil {
-		err = yaml.Unmarshal(content, &Config)
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(-1)
 	}
-	InitActivePath(Config.EnvConf.ActiveConf.Active)
-
-	InitRedisConfig()
-	InitDbConfig()
+	err = yaml.Unmarshal(content, &Config)
+	InitActivePath(relativePath, Config.EnvConf.ActiveConf.Active)
+	//初始化缓存配置信息
+	InitRedisConfig(relativePath)
+	//初始化db配置信息
+	InitDbConfig(relativePath)
 	return err
 }
-func InitRedisConfig() error {
+func InitRedisConfig(relativePath string) error {
 	if len(Path) == 0 {
-		InitCommConfig()
+		InitCommConfig(relativePath)
 	}
 	content, err := ioutil.ReadFile(activePath)
 	if err == nil {
@@ -78,9 +80,9 @@ func InitRedisConfig() error {
 	return err
 }
 
-func InitDbConfig() error {
+func InitDbConfig(relativePath string) error {
 	if len(Path) == 0 {
-		InitCommConfig()
+		InitCommConfig(relativePath)
 	}
 	content, err := ioutil.ReadFile(activePath)
 	if err == nil {
@@ -88,5 +90,3 @@ func InitDbConfig() error {
 	}
 	return err
 }
-
-

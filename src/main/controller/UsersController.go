@@ -2,8 +2,8 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
-	 "goAdmin/src/main/service"
-	 "goAdmin/src/main/utils"
+	"goAdmin/src/main/service"
+	"goAdmin/src/main/utils"
 	"net/http"
 )
 
@@ -23,7 +23,7 @@ func GetUserInfo(ctx gin.Context) {
 	var userId uint = 1
 	user := service.GetById(userId)
 	ctx.Status(http.StatusOK)
-	ctx.JSON(utils.SUCCESS_CODE,utils.Success( user))
+	ctx.JSON(utils.SuccessCode, utils.Success(user))
 }
 
 /**
@@ -38,9 +38,9 @@ func GetUserInfo(ctx gin.Context) {
 * @apiSuccess {String} data 返回数据
 * @apiPermission 登陆用户
  */
-func GetUser(ctx gin.Context) gin.HandlerFunc {
+func GetUser(ctx gin.Context) {
 	ctx.Status(http.StatusOK)
-	ctx.JSON(utils.SUCCESS_CODE,nil)
+	ctx.JSON(utils.SuccessCode, nil)
 
 }
 
@@ -60,7 +60,7 @@ func GetUser(ctx gin.Context) gin.HandlerFunc {
  */
 func CreateUser(ctx gin.Context) {
 	ctx.Status(http.StatusOK)
-	ctx.JSON(utils.SUCCESS_CODE,nil)
+	ctx.JSON(utils.SuccessCode, nil)
 }
 
 /**
@@ -79,7 +79,7 @@ func CreateUser(ctx gin.Context) {
  */
 func UpdateUser(ctx gin.Context) {
 	ctx.Status(http.StatusOK)
-	ctx.JSON(utils.SUCCESS_CODE,nil)
+	ctx.JSON(utils.SuccessCode, nil)
 }
 
 /**
@@ -96,7 +96,7 @@ func UpdateUser(ctx gin.Context) {
  */
 func DeleteUser(ctx gin.Context) {
 	ctx.Status(http.StatusOK)
-	ctx.JSON(utils.SUCCESS_CODE,nil)
+	ctx.JSON(utils.SuccessCode, nil)
 }
 
 /**
@@ -113,5 +113,5 @@ func DeleteUser(ctx gin.Context) {
  */
 func GetAllUsers(ctx gin.Context) {
 	ctx.Status(http.StatusOK)
-	ctx.JSON(utils.SUCCESS_CODE,nil)
+	ctx.JSON(utils.SuccessCode, nil)
 }

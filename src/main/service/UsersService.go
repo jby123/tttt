@@ -3,7 +3,7 @@ package service
 import (
 	"fmt"
 	"github.com/jameskeane/bcrypt"
-	 "goAdmin/src/main/comm/database"
+	"goAdmin/src/main/comm/database"
 	"goAdmin/src/main/model"
 )
 
@@ -15,8 +15,8 @@ import (
  * @param  {[type]} offset int    [description]
  * @param  {[type]} limit int    [description]
  */
-func FindByPage(name, orderBy string, offset, limit int) (users []*model.User) {
-	if err := database.FindPage("username",name, orderBy, offset, limit).Preload("Role").Find(&users).Error; err != nil {
+func FindByPage(name, orderBy string, offset, limit int) (users []*model.SysUser) {
+	if err := database.FindPage("username", name, orderBy, offset, limit).Preload("Role").Find(&users).Error; err != nil {
 		fmt.Printf("FindByPage.Error:%s", err)
 	}
 	return
@@ -25,10 +25,10 @@ func FindByPage(name, orderBy string, offset, limit int) (users []*model.User) {
 /**
  * 通过 id 获取 user 记录
  * @method GetById
- * @param  {[type]}       user  *User [description]
+ * @param  {[type]}       user  *SysUser [description]
  */
-func GetById(id uint) *model.User {
-	user := new(model.User)
+func GetById(id uint) *model.SysUser {
+	user := new(model.SysUser)
 	user.ID = id
 	if err := database.GetDB().First(user).Error; err != nil {
 		fmt.Printf("GetById.Err:%s", err)
@@ -39,10 +39,10 @@ func GetById(id uint) *model.User {
 /**
  * 通过 username 获取 user 记录
  * @method GetByUserName
- * @param  {[type]}       user  *User [description]
+ * @param  {[type]}       user  *SysUser [description]
  */
-func GetByUserName(username string) *model.User {
-	user := &model.User{Username: username}
+func GetByUserName(username string) *model.SysUser {
+	user := &model.SysUser{Username: username}
 	if err := database.GetDB().First(user).Error; err != nil {
 		fmt.Printf("GetByUserName.Err:%s", err)
 	}
@@ -55,14 +55,12 @@ func GetByUserName(username string) *model.User {
  * @method DeleteById
  */
 func DeleteById(id uint) {
-	u := new(model.User)
+	u := new(model.SysUser)
 	u.ID = id
 	if err := database.GetDB().Delete(u).Error; err != nil {
 		fmt.Printf("DeleteById.Err:%s", err)
 	}
 }
-
-
 
 /**
  * 创建
@@ -71,11 +69,11 @@ func DeleteById(id uint) {
  * @param  {[type]} cp int    [description]
  * @param  {[type]} mp int    [description]
  */
-func Create(aul *model.UserJson) (user *model.User) {
+func Create(aul *model.UserJson) (user *model.SysUser) {
 	salt, _ := bcrypt.Salt(10)
 	hash, _ := bcrypt.Hash(aul.Password, salt)
 
-	user = new(model.User)
+	user = new(model.SysUser)
 	user.Username = aul.Username
 	user.Password = hash
 	user.Name = aul.Name
@@ -95,11 +93,11 @@ func Create(aul *model.UserJson) (user *model.User) {
  * @param  {[type]} cp int    [description]
  * @param  {[type]} mp int    [description]
  */
-func Update(uj *model.UserJson, id uint) *model.User {
+func Update(uj *model.UserJson, id uint) *model.SysUser {
 	salt, _ := bcrypt.Salt(10)
 	hash, _ := bcrypt.Hash(uj.Password, salt)
 
-	user := new(model.User)
+	user := new(model.SysUser)
 	user.ID = id
 	uj.Password = hash
 
@@ -110,15 +108,13 @@ func Update(uj *model.UserJson, id uint) *model.User {
 	return user
 }
 
-
-
 /**
  * 校验用户登录
  * @method checkLogin
  * @param  {[type]}       username string [description]
  */
-func checkLogin(username string) model.User {
-	u := model.User{}
+func checkLogin(username string) model.SysUser {
+	u := model.SysUser{}
 	if err := database.GetDB().Where("username = ?", username).First(&u).Error; err != nil {
 		fmt.Printf("checkLogin.Err:%s", err)
 	}

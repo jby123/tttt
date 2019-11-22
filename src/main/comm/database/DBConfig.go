@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"goAdmin/src/main/utils"
+	"os"
 	"time"
 )
 
@@ -11,7 +13,7 @@ var DBClient *gorm.DB
 
 //数据库常量
 type DbConfig struct {
-	Db MysqlConf  `yaml:"DB"`
+	Db MysqlConf `yaml:"DB"`
 }
 
 type MysqlConf struct {
@@ -20,21 +22,34 @@ type MysqlConf struct {
 	Username   string `yaml:"Username"`
 	Password   string `yaml:"Password"`
 	Dialect    string `yaml:"Dialect"`
-	MaxIdle int    `yaml:"maxIdle"`
-	MaxOpen int    `yaml:"maxOpen"`
+	MaxIdle    int    `yaml:"maxIdle"`
+	MaxOpen    int    `yaml:"maxOpen"`
 }
 
-
 // 初始化mysql
-func InitMysql(conf *DbConfig) (err error){
-	DBClient, err = gorm.Open(conf.Db.Dialect, conf.Db.Url)
-
-	if err == nil {
-		DBClient.DB().SetMaxIdleConns(conf.Db.MaxIdle)
-		DBClient.DB().SetMaxOpenConns(conf.Db.MaxOpen)
-		DBClient.DB().SetConnMaxLifetime(time.Duration(30) * time.Minute)
-		err = DBClient.DB().Ping()
+func InitMysql(activeEnv string, dbConfig *DbConfig) (err error) {
+	DBClient, err = gorm.Open(dbConfig.Db.Dialect, dbConfig.Db.Url)
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(-1)
 	}
+	if len(activeEnv) != 0 && activeEnv == utils.DefaultDevelopmentEnv {
+		DBClient.LogMode(true)
+	}
+	DBClient.DB().SetMaxIdleConns(dbConfig.Db.MaxIdle)
+	DBClient.DB().SetMaxOpenConns(dbConfig.Db.MaxOpen)
+	DBClient.DB().SetConnMaxLifetime(time.Duration(30) * time.Minute)
+	err = DBClient.DB().Ping()
+	/**
+	 *禁用表名复数>
+	 *!!!如不禁用则会出现表 y结尾边ies的问题
+	 *!!!如果只是部分表需要使用源表名，请在实体类中声明TableName的构造函数
+	 *
+	 *func (实体名) TableName() string {
+	 *   return "数据库表名"
+	 *}
+	 */
+	DBClient.SingularTable(true)
 	return
 }
 
@@ -52,8 +67,8 @@ func GetDB() *gorm.DB {
  * @param  {[type]} relation string    [description]
  * @param  {[type]} offset int    [description]
  * @param  {[type]} limit int    [description]
- */
-func FindPage(searchKey,searchValue, orderBy string, offset, limit int) *gorm.DB {
+*/
+func FindPage(searchKey, searchValue, orderBy string, offset, limit int) *gorm.DB {
 
 	if len(orderBy) > 0 {
 		DBClient = DBClient.Order(orderBy + "desc")
@@ -62,7 +77,7 @@ func FindPage(searchKey,searchValue, orderBy string, offset, limit int) *gorm.DB
 	}
 
 	if len(searchKey) > 0 {
-		if len(searchValue) >0 {
+		if len(searchValue) > 0 {
 			DBClient = DBClient.Where(""+searchKey+" LIKE  ?", "%"+searchValue+"%")
 		}
 	}
@@ -76,7 +91,6 @@ func FindPage(searchKey,searchValue, orderBy string, offset, limit int) *gorm.DB
 	}
 	return DBClient
 }
-
 
 // 关闭DB
 func CloseDB() {

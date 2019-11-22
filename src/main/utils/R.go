@@ -6,17 +6,17 @@ import (
 )
 
 type ResultData struct {
-	Status int        `json:"status"`
+	Status int         `json:"status"`
 	Msg    interface{} `json:"msg"`
 	Data   interface{} `json:"data"`
 }
 
-func Success( objects interface{}) (resultData *ResultData) {
-	resultData = &ResultData{Status: SUCCESS_CODE, Data: objects, Msg: SUCCESS_MESSAGE}
+func Success(objects interface{}) (resultData *ResultData) {
+	resultData = &ResultData{Status: SuccessCode, Data: objects, Msg: SuccessMessage}
 	return resultData
 }
 
-func Error( status int, message, data interface{}) (resultData *ResultData) {
+func Error(status int, message, data interface{}) (resultData *ResultData) {
 	resultData = &ResultData{Status: status, Data: data, Msg: message}
 	return resultData
 }
@@ -47,4 +47,3 @@ func transformer(objects interface{}) interface{} {
 
 	return objects
 }
-
