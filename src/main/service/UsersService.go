@@ -15,7 +15,7 @@ import (
  * @param  {[type]} offset int    [description]
  * @param  {[type]} limit int    [description]
  */
-func FindByPage(name, orderBy string, offset, limit int) (users []*model.SysUser) {
+func FindUserByPage(name, orderBy string, offset, limit int) (users []*model.SysUser) {
 	if err := database.FindPage("username", name, orderBy, offset, limit).Preload("Role").Find(&users).Error; err != nil {
 		fmt.Printf("FindByPage.Error:%s", err)
 	}
@@ -27,7 +27,7 @@ func FindByPage(name, orderBy string, offset, limit int) (users []*model.SysUser
  * @method GetById
  * @param  {[type]}       user  *SysUser [description]
  */
-func GetById(id uint) *model.SysUser {
+func GetUserById(id uint) *model.SysUser {
 	user := new(model.SysUser)
 	user.ID = id
 	if err := database.GetDB().First(user).Error; err != nil {
@@ -41,7 +41,7 @@ func GetById(id uint) *model.SysUser {
  * @method GetByUserName
  * @param  {[type]}       user  *SysUser [description]
  */
-func GetByUserName(username string) *model.SysUser {
+func GetUserByUserName(username string) *model.SysUser {
 	user := &model.SysUser{Username: username}
 	if err := database.GetDB().First(user).Error; err != nil {
 		fmt.Printf("GetByUserName.Err:%s", err)
@@ -54,7 +54,7 @@ func GetByUserName(username string) *model.SysUser {
  * 通过 id 删除用户
  * @method DeleteById
  */
-func DeleteById(id uint) {
+func DeleteUserById(id uint) {
 	u := new(model.SysUser)
 	u.ID = id
 	if err := database.GetDB().Delete(u).Error; err != nil {
@@ -69,7 +69,7 @@ func DeleteById(id uint) {
  * @param  {[type]} cp int    [description]
  * @param  {[type]} mp int    [description]
  */
-func Create(aul *model.UserJson) (user *model.SysUser) {
+func CreateUser(aul *model.UserJson) (user *model.SysUser) {
 	salt, _ := bcrypt.Salt(10)
 	hash, _ := bcrypt.Hash(aul.Password, salt)
 
@@ -93,7 +93,7 @@ func Create(aul *model.UserJson) (user *model.SysUser) {
  * @param  {[type]} cp int    [description]
  * @param  {[type]} mp int    [description]
  */
-func Update(uj *model.UserJson, id uint) *model.SysUser {
+func UpdateUser(uj *model.UserJson, id uint) *model.SysUser {
 	salt, _ := bcrypt.Salt(10)
 	hash, _ := bcrypt.Hash(uj.Password, salt)
 
