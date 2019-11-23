@@ -12,9 +12,12 @@ import (
  * @method AuthTokenHandler
  * @param  {[type]}  context       iris.Context    [description]
  */
-func AuthTokenHandler(context gin.Context) {
-	context.Status(http.StatusUnauthorized)
-	context.Next()
+
+func AuthTokenHandler() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		context.Status(http.StatusOK)
+		context.Next()
+	}
 }
 
 func ValidateToken() gin.HandlerFunc {

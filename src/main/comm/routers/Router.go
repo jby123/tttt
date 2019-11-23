@@ -3,8 +3,7 @@ package routers
 import (
 	"github.com/gin-gonic/gin"
 	"goAdmin/src/main/comm/middleware"
-	"goAdmin/src/main/utils"
-	"net/http"
+	"goAdmin/src/main/controller"
 )
 
 func RegisterRoute(application *gin.Engine) {
@@ -18,9 +17,7 @@ func RegisterRoute(application *gin.Engine) {
 	application.Use(middleware.LogHandler)
 
 	// register 404 NotFound
-	application.NoRoute(func(c *gin.Context) {
-		c.JSON(http.StatusNotFound, utils.Error(http.StatusBadRequest, "NOT.FOUND", nil))
-	})
+	application.NoRoute(middleware.GlobalNoRouteHandler)
 
 	//1 路由组 api/admin
 	route := application.Group("/api/admin")
@@ -29,31 +26,32 @@ func RegisterRoute(application *gin.Engine) {
 	comm := route.Group("/comm")
 	//公共业务块api
 	{
-		comm.GET("/captcha", nil) //获取验证码
-		comm.POST("/login", nil)  //登入
+		comm.GET("/captcha", controller.Captcha()) //获取验证码
+		comm.POST("/login", controller.Login())    //登入
 
 		//登入后 获取  [需要校验token]
-		comm.GET("/permmenu", nil)
-		comm.GET("/person", nil)         //当前用户信息
-		comm.POST("/person-update", nil) //修改当前用户信息[修改密码、头像]
+		comm.GET("/permmenu", controller.CurrentAuthorizationMenus())
+		comm.GET("/person", controller.CurrentUserInfo())               //当前用户信息
+		comm.POST("/person-update", controller.UpdateCurrentUserInfo()) //修改当前用户信息[修改密码、头像]
 	}
 
 	//1-2 路由组 api/admin/sys 系统业务块  [需要校验token][需要权限校验拦截、登入拦截]
 	sys := route.Group("/sys")
+	sys.Use(middleware.AuthTokenHandler())
 	//日志api
 	{
 		log := sys.Group("/log")
-		log.GET("/page", nil)
+		log.GET("/page", controller.LogPage())
 	}
 	//用户api
 	{
 		user := sys.Group("/user")
-		user.GET("/page", nil)
-		user.GET("/list", nil)
-		user.GET("/info", nil)
-		user.POST("/add", nil)
-		user.POST("/update", nil)
-		user.POST("/delete", nil)
+		user.GET("/page", controller.PageUsers())
+		user.GET("/list", controller.GetAllUsers())
+		user.GET("/info", controller.GetUser())
+		user.POST("/add", controller.CreateUser())
+		user.POST("/update", controller.UpdateUser())
+		user.POST("/delete", controller.DeleteUser())
 	}
 	//角色 api
 	{

@@ -13,7 +13,9 @@ import (
  * @method AuthPermissionHandler
  * @param  {[type]}  context       gin.Context    [description]
  */
-func AuthPermissionHandler(context gin.Context) {
-	context.Status(http.StatusUnauthorized)
-	context.Next()
+func AuthPermissionHandler() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		context.Status(http.StatusOK)
+		context.Next()
+	}
 }
