@@ -9,7 +9,7 @@ import (
 )
 
 /**
- * 授权登入
+ * 授权登入 <p>https://www.bandari.net/blog/23</p>
  * 判断 token 是否有效
  * 如果有效 就获取信息并且保存到请求里面
  * @method AuthTokenHandler
