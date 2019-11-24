@@ -15,8 +15,7 @@ DB:
 Notify:
   ErrorIsOpen: false
   Email:
-    FromEmail: 771385381@qq.com
-    EmailHost: 163.com
-    EmailPort: 8080
+    FromEmail: xfzandysw@163.com
+    EmailHost: smtp.163.com
+    EmailPort: 465
     EmailPass: 123456
-

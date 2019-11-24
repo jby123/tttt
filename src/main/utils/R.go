@@ -6,12 +6,6 @@ import (
 	"reflect"
 )
 
-type ResultData struct {
-	Status int         `json:"status"`
-	Msg    interface{} `json:"msg"`
-	Data   interface{} `json:"data"`
-}
-
 func Success(objects interface{}) map[string]interface{} {
 	return gin.H{
 		"status": SuccessCode,

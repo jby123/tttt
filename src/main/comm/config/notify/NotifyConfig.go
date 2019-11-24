@@ -1,6 +1,6 @@
-package config
+package notify
 
-type NotifyConf struct {
+type Conf struct {
 	Notify      IsOpenNotify      `yaml:"Notify"`
 	EmailConfig EmailNotifyConfig `yaml:"Email"`
 }

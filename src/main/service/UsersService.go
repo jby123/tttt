@@ -127,13 +127,12 @@ func checkLogin(username string) model.SysUser {
  * @param  {[type]}  id       int    [description]
  * @param  {[type]}  password string [description]
  */
-func Login(username, password string) (response string, status bool, msg string) {
-	user := checkLogin(username)
+func Login(username, password string) (status bool, user model.SysUser, err error) {
+	user = checkLogin(username)
 	if user.ID == 0 {
-		msg = "用户不存在"
-		return
+		return false, user, err
 	} else {
-		return
+		return true, user, err
 
 	}
 }

@@ -3,6 +3,8 @@ package middleware
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+
+	"goAdmin/src/main/utils"
 	"net/http"
 )
 
@@ -15,31 +17,33 @@ import (
  */
 
 func AuthTokenHandler() gin.HandlerFunc {
-	return func(context *gin.Context) {
-		fmt.Println("<<<<<<<<<<authentication.begin>>>>>>>>>>>>>>")
-		context.Status(http.StatusOK)
-		context.Next()
-		fmt.Println("<<<<<<<<<<authentication.end>>>>>>>>>>>>>>")
-	}
+	return ValidateToken()
 }
 
 func ValidateToken() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		token := c.Request.FormValue("token")
+	return func(context *gin.Context) {
+		fmt.Println("<<<<<<<<<<authentication.begin>>>>>>>>>>>>>>")
+		token := context.Request.Header.Get("authorization")
 		if token == "" {
-			c.JSON(401, gin.H{
-				"message": "Token required",
-			})
-			c.Abort()
+			context.JSON(http.StatusUnauthorized, utils.Error(401, "请求未携带token，无权限访问", nil))
+			context.Abort()
 			return
 		}
-		if token != "accesstoken" {
-			c.JSON(http.StatusOK, gin.H{
-				"message": "Invalid Token",
-			})
-			c.Abort()
+		j := utils.NewJWT()
+		// parseToken 解析token包含的信息
+		claims, err := j.ParseToken(token)
+		if err != nil {
+			if err == utils.TokenExpired {
+				context.JSON(http.StatusUnauthorized, utils.Error(401, "token.expire", nil))
+				context.Abort()
+				return
+			}
+			context.JSON(http.StatusOK, utils.Error(500, "token.unknown.error", nil))
+			context.Abort()
 			return
 		}
-		c.Next()
+		// 继续交由下一个路由处理,并将解析出的信息传递下去
+		context.Set("claims", claims)
+		fmt.Println("<<<<<<<<<<authentication.end>>>>>>>>>>>>>>")
 	}
 }

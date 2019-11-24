@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"goAdmin/src/main/comm/cache"
 	"goAdmin/src/main/comm/config"
@@ -10,6 +11,7 @@ import (
 	"goAdmin/src/main/utils"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 )
 
@@ -44,5 +46,11 @@ func main() {
 	if err := http.ListenAndServe(":"+strconv.Itoa(config.Config.ServerConf.Port), app); err != nil {
 		log.Fatal(err)
 	}
-
+	fmt.Println("|-----------------------------------|")
+	fmt.Println("|            go-admin             |")
+	fmt.Println("|-----------------------------------|")
+	fmt.Println("|  Go Admin Server Start Successful  |")
+	fmt.Println("|    Port" + strconv.Itoa(config.Config.ServerConf.Port) + "     Pid:" + fmt.Sprintf("%d", os.Getpid()) + "        |")
+	fmt.Println("|-----------------------------------|")
+	fmt.Println("")
 }

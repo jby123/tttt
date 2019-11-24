@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
-	"goAdmin/src/main/utils"
 	"os"
 	"time"
 )
 
 var DBClient *gorm.DB
+
+const DefaultDevelopmentEnv = "dev"
 
 //数据库常量
 type DbConfig struct {
@@ -33,7 +34,7 @@ func InitMysql(activeEnv string, dbConfig *DbConfig) (err error) {
 		fmt.Println(err.Error())
 		os.Exit(-1)
 	}
-	if len(activeEnv) != 0 && activeEnv == utils.DefaultDevelopmentEnv {
+	if len(activeEnv) != 0 && activeEnv == DefaultDevelopmentEnv {
 		DBClient.LogMode(true)
 	}
 	DBClient.DB().SetMaxIdleConns(dbConfig.Db.MaxIdle)

@@ -3,12 +3,14 @@ package config
 import (
 	"fmt"
 	"goAdmin/src/main/comm/cache"
+	"goAdmin/src/main/comm/config/notify"
 	"goAdmin/src/main/comm/database"
-	"goAdmin/src/main/utils"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 )
+
+const DefaultDevelopmentEnv = "dev"
 
 //总配置
 type Conf struct {
@@ -36,7 +38,7 @@ var RedisConf cache.RedisConfig
 
 var DbConf database.DbConfig
 
-var NotifyConfig NotifyConf
+var NotifyConfig notify.Conf
 
 // 初始化解析参数
 var Path string
@@ -49,7 +51,7 @@ func PreInit(relativePath string) {
 
 func InitActivePath(relativePath, activeEnv string) {
 	if len(activePath) <= 0 {
-		activeEnv = utils.DefaultDevelopmentEnv
+		activeEnv = DefaultDevelopmentEnv
 	}
 	activePath = relativePath + "/application_" + activeEnv + ".yaml"
 

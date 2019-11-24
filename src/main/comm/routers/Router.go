@@ -14,7 +14,7 @@ func RegisterRoute(application *gin.Engine) {
 	//拦截器：全局Cors中间件
 	application.Use(middleware.CorsHandler())
 	//拦截器：全局日志中间件
-	application.Use(middleware.LogHandler)
+	application.Use(middleware.LogHandler())
 
 	// register 404 NotFound
 	application.NoRoute(middleware.GlobalNoRouteHandler)
