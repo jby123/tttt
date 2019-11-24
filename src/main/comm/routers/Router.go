@@ -26,8 +26,9 @@ func RegisterRoute(application *gin.Engine) {
 	comm := route.Group("/comm")
 	//公共业务块api
 	{
-		comm.GET("/captcha", controller.Captcha()) //获取验证码
-		comm.POST("/login", controller.Login())    //登入
+		comm.GET("/captcha", controller.Captcha())             //获取验证码
+		comm.GET("/verifyCaptcha", controller.VerifyCaptcha()) //验证-验证码
+		comm.POST("/login", controller.Login())                //登入
 
 		//登入后 获取  [需要校验token]
 		comm.GET("/permmenu", controller.CurrentAuthorizationMenus())
@@ -41,11 +42,13 @@ func RegisterRoute(application *gin.Engine) {
 	//日志api
 	{
 		log := sys.Group("/log")
+		log.Use(middleware.AuthorizationHandler())
 		log.GET("/page", controller.LogPage())
 	}
 	//用户api
 	{
 		user := sys.Group("/user")
+		user.Use(middleware.AuthorizationHandler())
 		user.GET("/page", controller.PageUsers())
 		user.GET("/list", controller.GetAllUsers())
 		user.GET("/info", controller.GetUser())
@@ -56,6 +59,7 @@ func RegisterRoute(application *gin.Engine) {
 	//角色 api
 	{
 		role := sys.Group("/role")
+		role.Use(middleware.AuthorizationHandler())
 		role.GET("/page", nil)
 		role.GET("/list", nil)
 		role.GET("/info", nil)
@@ -66,6 +70,7 @@ func RegisterRoute(application *gin.Engine) {
 	//角色 api
 	{
 		menu := sys.Group("/menu")
+		menu.Use(middleware.AuthorizationHandler())
 		menu.GET("/page", nil)
 		menu.GET("/list", nil)
 		menu.GET("/info", nil)
@@ -76,6 +81,7 @@ func RegisterRoute(application *gin.Engine) {
 	//部门 api
 	{
 		department := sys.Group("/department")
+		department.Use(middleware.AuthorizationHandler())
 		department.GET("/page", nil)
 		department.GET("/list", nil)
 		department.GET("/info", nil)

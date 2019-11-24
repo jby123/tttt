@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	cache2 "goAdmin/src/main/comm/cache"
+	"goAdmin/src/main/comm/cache"
 	"goAdmin/src/main/comm/database"
 	"goAdmin/src/main/utils"
 	"gopkg.in/yaml.v2"
@@ -32,9 +32,11 @@ type Profiles struct {
 
 var Config Conf
 
-var RedisConf cache2.RedisConfig
+var RedisConf cache.RedisConfig
 
 var DbConf database.DbConfig
+
+var NotifyConfig NotifyConf
 
 // 初始化解析参数
 var Path string
@@ -67,6 +69,8 @@ func InitCommConfig(relativePath string) error {
 	InitRedisConfig(relativePath)
 	//初始化db配置信息
 	InitDbConfig(relativePath)
+	//初始化通知配置信息
+	InitNotifyConfig(relativePath)
 	return err
 }
 func InitRedisConfig(relativePath string) error {
@@ -87,6 +91,17 @@ func InitDbConfig(relativePath string) error {
 	content, err := ioutil.ReadFile(activePath)
 	if err == nil {
 		err = yaml.Unmarshal(content, &DbConf)
+	}
+	return err
+}
+
+func InitNotifyConfig(relativePath string) error {
+	if len(Path) == 0 {
+		InitCommConfig(relativePath)
+	}
+	content, err := ioutil.ReadFile(activePath)
+	if err == nil {
+		err = yaml.Unmarshal(content, &NotifyConfig)
 	}
 	return err
 }

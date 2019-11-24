@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -15,8 +16,10 @@ import (
 
 func AuthTokenHandler() gin.HandlerFunc {
 	return func(context *gin.Context) {
+		fmt.Println("<<<<<<<<<<authentication.begin>>>>>>>>>>>>>>")
 		context.Status(http.StatusOK)
 		context.Next()
+		fmt.Println("<<<<<<<<<<authentication.end>>>>>>>>>>>>>>")
 	}
 }
 

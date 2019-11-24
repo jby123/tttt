@@ -11,3 +11,12 @@ DB:
   Username: root
   Password: zjj930716.
   Dialect: mysql
+
+Notify:
+  ErrorIsOpen: false
+  Email:
+    FromEmail: 771385381@qq.com
+    EmailHost: 163.com
+    EmailPort: 8080
+    EmailPass: 123456
+

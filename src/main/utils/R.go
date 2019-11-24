@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"reflect"
 )
 
@@ -11,16 +12,33 @@ type ResultData struct {
 	Data   interface{} `json:"data"`
 }
 
-func Success(objects interface{}) (resultData *ResultData) {
-	resultData = &ResultData{Status: SuccessCode, Data: objects, Msg: SuccessMessage}
-	return resultData
+func Success(objects interface{}) map[string]interface{} {
+	return gin.H{
+		"status": SuccessCode,
+		"msg":    SuccessMessage,
+		"data":   objects,
+	}
 }
 
-func Error(status int, message, data interface{}) (resultData *ResultData) {
-	resultData = &ResultData{Status: status, Data: data, Msg: message}
-	return resultData
+func Error(status int, message string, data interface{}) map[string]interface{} {
+	return gin.H{
+		"status": status,
+		"msg":    message,
+		"data":   data,
+	}
 }
 
+func StructToMap(obj interface{}) map[string]interface{} {
+	obj1 := reflect.TypeOf(obj)
+	obj2 := reflect.ValueOf(obj)
+
+	var data = make(map[string]interface{})
+	for i := 0; i < obj1.NumField(); i++ {
+		data[obj1.Field(i).Name] = obj2.Field(i).Interface()
+	}
+	return data
+
+}
 func transformer(objects interface{}) interface{} {
 	getType := reflect.TypeOf(objects)
 	fmt.Println("get Type is :", getType.Name())

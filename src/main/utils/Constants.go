@@ -6,6 +6,8 @@ const DefaultDevelopmentRelativePath = "./src/resources"
 const DefaultTestRelativePath = "./src/test/resources"
 const DefaultDevelopmentEnv = "dev"
 
+const DefaultCaptchaLen = 4
+
 const DEFAULT_EXPIRE_SECOND_TIME = time.Duration(30) * time.Second
 
 const DEFAULT_EXPIRE_HOURE_TIME = time.Duration(1) * time.Hour

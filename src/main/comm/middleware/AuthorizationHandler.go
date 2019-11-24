@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -13,9 +14,11 @@ import (
  * @method AuthPermissionHandler
  * @param  {[type]}  context       gin.Context    [description]
  */
-func AuthPermissionHandler() gin.HandlerFunc {
+func AuthorizationHandler() gin.HandlerFunc {
 	return func(context *gin.Context) {
+		fmt.Println("<<<<<<<<<<authorization.begin>>>>>>>>>>>>>>")
 		context.Status(http.StatusOK)
 		context.Next()
+		fmt.Println("<<<<<<<<<<authorization.end>>>>>>>>>>>>>>")
 	}
 }
