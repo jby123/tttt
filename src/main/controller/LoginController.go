@@ -8,7 +8,6 @@ import (
 	"goAdmin/src/main/model"
 	"goAdmin/src/main/service"
 	"goAdmin/src/main/utils"
-	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -32,7 +31,9 @@ type LoginRespVo struct {
 func Login() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var loginReq LoginReq
-		if ctx.BindJSON(&loginReq) != nil {
+		error := ctx.BindJSON(&loginReq)
+		if error != nil {
+			fmt.Printf("login.bind.error.%s \n", error)
 			ctx.Status(http.StatusBadRequest)
 			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
 			return
@@ -49,25 +50,25 @@ func Login() gin.HandlerFunc {
 			return
 		}
 		if status {
-			generateToken(ctx, user)
+			GenerateToken(ctx, user)
 		}
 
 	}
 }
 
 //生成令牌
-func generateToken(c *gin.Context, user model.SysUser) {
+func GenerateToken(c *gin.Context, user model.SysUser) {
 	jwt := utils.JWT{SigningKey: []byte(utils.SigningKey)}
 
-	var expiresAt int64 = int64(utils.DEFAULT_EXPIRE_HOURE_TIME)
+	var expiresAt int64 = int64(utils.DEFAULT_EXPIRE_HOURE_TIME) // 过期时间 一小时
 	claims := utils.CustomClaims{
 		ID:    strconv.Itoa(int(user.ID)),
 		Name:  user.Name,
 		Phone: user.Phone,
 		StandardClaims: jwtgo.StandardClaims{
 			NotBefore: int64(time.Now().Unix() - 1000), // 签名生效时间
-			ExpiresAt: expiresAt,                       // 过期时间 一小时
-			Issuer:    utils.Issuer,                    //签名的发行者
+			ExpiresAt: expiresAt,
+			Issuer:    utils.Issuer, // 签名的发行者
 		},
 	}
 	token, err := jwt.CreateToken(claims)

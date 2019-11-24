@@ -31,9 +31,9 @@ func RegisterRoute(application *gin.Engine) {
 		comm.POST("/login", controller.Login())                //登入
 
 		//登入后 获取  [需要校验token]
-		comm.GET("/permmenu", controller.CurrentAuthorizationMenus())
-		comm.GET("/person", controller.CurrentUserInfo())               //当前用户信息
-		comm.POST("/person-update", controller.UpdateCurrentUserInfo()) //修改当前用户信息[修改密码、头像]
+		comm.GET("/permmenu", middleware.AuthTokenHandler(), controller.CurrentAuthorizationMenus())
+		comm.GET("/person", middleware.AuthTokenHandler(), controller.CurrentUserInfo())               //当前用户信息
+		comm.POST("/person-update", middleware.AuthTokenHandler(), controller.UpdateCurrentUserInfo()) //修改当前用户信息[修改密码、头像]
 	}
 
 	//1-2 路由组 api/admin/sys 系统业务块  [需要校验token][需要权限校验拦截、登入拦截]

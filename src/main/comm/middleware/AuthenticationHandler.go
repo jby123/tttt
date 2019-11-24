@@ -38,6 +38,7 @@ func ValidateToken() gin.HandlerFunc {
 				context.Abort()
 				return
 			}
+			fmt.Printf("Validate.token.error.%s\n", err)
 			context.JSON(http.StatusOK, utils.Error(500, "token.unknown.error", nil))
 			context.Abort()
 			return
