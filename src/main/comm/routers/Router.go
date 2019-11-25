@@ -11,6 +11,10 @@ func RegisterRoute(application *gin.Engine) {
 	application.Use(gin.Logger())
 	//拦截器：全局异常恢复中间件
 	application.Use(gin.Recovery())
+	//拦截器：全局黑名单中间件
+	application.Use(middleware.IPBlackHandler())
+	//拦截器：全局I18N中间件
+	application.Use(middleware.I18nHandler())
 	//拦截器：全局Cors中间件
 	application.Use(middleware.CorsHandler())
 	//拦截器：全局日志中间件

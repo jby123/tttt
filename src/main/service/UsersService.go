@@ -15,8 +15,9 @@ import (
  * @param  {[type]} offset int    [description]
  * @param  {[type]} limit int    [description]
  */
-func FindUserByPage(name, orderBy string, offset, limit int) (users []*model.SysUser) {
-	if err := database.FindPage("username", name, orderBy, offset, limit).Preload("Role").Find(&users).Error; err != nil {
+func FindUserByPage(departmentId int, name, orderBy string, offset, limit int) (users []*model.SysUser) {
+	searchMap := database.SearchMap{"username": name, "department_id": departmentId}
+	if err := database.FindPage(searchMap, orderBy, offset, limit).Find(&users).Error; err != nil {
 		fmt.Printf("FindByPage.Error:%s", err)
 	}
 	return

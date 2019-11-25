@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"goAdmin/src/main/utils"
 	"net/http"
@@ -25,7 +26,13 @@ func CurrentAuthorizationMenus() gin.HandlerFunc {
  */
 func CurrentUserInfo() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-
+		claimsData, exists := ctx.Get("claims")
+		if !exists {
+			ctx.JSON(http.StatusOK, utils.Error(utils.BUSINESS_ERROR, "获取不到当前用户信息.[system.get.claims.not.exist]", nil))
+			return
+		}
+		customClaims := claimsData.(utils.CustomClaims)
+		fmt.Println("CurrentUserInfo.claims....userId", customClaims.ID)
 	}
 }
 

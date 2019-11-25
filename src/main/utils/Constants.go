@@ -3,8 +3,6 @@ package utils
 import "time"
 
 const AppName = "goAdmin"
-const SigningKey = "tehabi@admin.com"
-const Issuer = "lucky" //签名发行者
 const DefaultDevelopmentRelativePath = "./src/resources"
 const DefaultTestRelativePath = "./src/test/resources"
 const DefaultDevelopmentEnv = "dev"

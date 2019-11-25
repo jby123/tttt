@@ -2,7 +2,10 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"goAdmin/src/main/controller/vo/req"
+	"goAdmin/src/main/service"
 	"net/http"
+	"strconv"
 )
 
 /**
@@ -17,6 +20,12 @@ import (
  */
 func PageUsers() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+
+		basePageReq := req.ParsePageReq(ctx)
+		departmentIdStr := ctx.Query("departmentId")
+		departmentId, err := strconv.Atoi(departmentIdStr)
+
+		service.FindUserByPage(departmentId, basePageReq.KeyWord, basePageReq.Order, basePageReq.Page, basePageReq.Size)
 		ctx.Status(http.StatusOK)
 		ctx.JSON(http.StatusOK, nil)
 	}

@@ -9,8 +9,6 @@ import (
 	"goAdmin/src/main/service"
 	"goAdmin/src/main/utils"
 	"net/http"
-	"strconv"
-	"time"
 )
 
 type LoginReq struct {
@@ -58,15 +56,14 @@ func Login() gin.HandlerFunc {
 
 //生成令牌
 func GenerateToken(c *gin.Context, user model.SysUser) {
-	jwt := utils.JWT{SigningKey: []byte(utils.SigningKey)}
+	jwt := utils.JWT{SigningKey: []byte(utils.SignKey)}
 
 	var expiresAt int64 = int64(utils.DEFAULT_EXPIRE_HOURE_TIME) // 过期时间 一小时
 	claims := utils.CustomClaims{
-		ID:    strconv.Itoa(int(user.ID)),
+		ID:    user.ID,
 		Name:  user.Name,
 		Phone: user.Phone,
 		StandardClaims: jwtgo.StandardClaims{
-			NotBefore: int64(time.Now().Unix() - 1000), // 签名生效时间
 			ExpiresAt: expiresAt,
 			Issuer:    utils.Issuer, // 签名的发行者
 		},

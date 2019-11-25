@@ -5,6 +5,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -59,38 +60,109 @@ func GetDB() *gorm.DB {
 	return DBClient
 }
 
+type SearchMap map[string]interface{}
+
 /**
  * 获取列表
  * @method FindPage
- * @param  {[type]} searchKey string    [description]
+ * @param  {[type]} searchMap map[string] interface{}    [description]
 * @param  {[type]} searchValue string    [description]
+* @param  {[type]} order string    [description]
  * @param  {[type]} orderBy string    [description]
  * @param  {[type]} relation string    [description]
  * @param  {[type]} offset int    [description]
  * @param  {[type]} limit int    [description]
 */
-func FindPage(searchKey, searchValue, orderBy string, offset, limit int) *gorm.DB {
+func FindPage(searchMap map[string]interface{}, order, sort string, offset, limit int) *gorm.DB {
 
-	if len(orderBy) > 0 {
-		DBClient = DBClient.Order(orderBy + "desc")
-	} else {
-		DBClient = DBClient.Order("created_at desc")
+	if len(sort) <= 0 {
+		sort = "desc"
 	}
-
-	if len(searchKey) > 0 {
-		if len(searchValue) > 0 {
-			DBClient = DBClient.Where(""+searchKey+" LIKE  ?", "%"+searchValue+"%")
-		}
+	if len(order) <= 0 {
+		order = "created_at"
 	}
+	DBClient = DBClient.Order(" " + order + " " + sort + " ")
 
+	searchSql, searchArgs := ParseSearchMap(searchMap)
+	if len(searchSql) > 0 {
+		DBClient = DBClient.Where(searchSql, searchArgs)
+	}
 	if offset > 0 {
 		DBClient = DBClient.Offset((offset - 1) * limit)
 	}
-
 	if limit > 0 {
 		DBClient = DBClient.Limit(limit)
 	}
 	return DBClient
+}
+
+func ParseSearchMap(searchMap map[string]interface{}) (string, []interface{}) {
+	var querySql string
+	var index int = 0
+	var queryArgs []interface{}
+	for searchKey, searchValue := range searchMap {
+		fmt.Println("searchValue", searchValue)
+		if len(searchKey) > 0 {
+			switch vv := searchValue.(type) {
+			case string:
+				if len(querySql) == 0 {
+					querySql += " " + searchKey + " LIKE  ? "
+				} else {
+					querySql += " AND " + searchKey + " LIKE  ? "
+				}
+				queryArgs[index] = searchValue
+			case float64:
+				if len(querySql) == 0 {
+					querySql += " " + searchKey + " =  ? "
+				} else {
+					querySql += " AND " + searchKey + " =  ? "
+				}
+				queryArgs[index] = searchValue
+			case int:
+				if len(querySql) == 0 {
+					querySql += " " + searchKey + " =  ? "
+				} else {
+					querySql += " AND " + searchKey + " =  ? "
+				}
+				queryArgs[index] = searchValue
+			case uint:
+				if len(querySql) == 0 {
+					querySql += " " + searchKey + " =  ? "
+				} else {
+					querySql += " AND " + searchKey + " =  ? "
+				}
+				queryArgs[index] = searchValue
+			case []interface{}:
+				var stringSlice []string
+				for _, u := range vv {
+					stringSlice = append(stringSlice, u.(string))
+				}
+				values := strings.Join(stringSlice, "_")
+				if len(values) > 0 {
+					if len(querySql) == 0 {
+						querySql += " " + searchKey + " in (?) "
+					} else {
+						querySql += " AND " + searchKey + " in (?) "
+					}
+					queryArgs[index] = values
+				}
+			case nil:
+				if len(querySql) == 0 {
+					querySql += " " + searchKey + " IS nil "
+				} else {
+					querySql += " AND IS nil "
+				}
+			case map[string]interface{}:
+				//todo 后期完成复杂实现
+			default:
+
+			}
+
+		}
+		index++
+	}
+	return querySql, queryArgs
+
 }
 
 // 关闭DB

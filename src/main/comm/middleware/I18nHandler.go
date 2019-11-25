@@ -7,17 +7,14 @@ import (
 	"golang.org/x/text/language/display"
 )
 
-func I18nMiddleware() gin.HandlerFunc {
+func I18nHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		locale := ctx.Query("locale")
+		locale := ctx.Query("lang")
 		if locale != "" {
 			ctx.Request.Header.Set("Accept-Language", locale)
 		}
 		language := ctx.GetHeader("Accept-Language")
 		getAcceptLanguage(language)
-
-		// NOTE: On June 2012, the deprecation of recommendation to use the "X-" prefix has become official as RFC 6648.
-		// https://stackoverflow.com/questions/3561381/custom-http-headers-naming-conventions
 		ctx.Request.Header.Set("I18n-Language", language)
 		ctx.Next()
 	}

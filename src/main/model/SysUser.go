@@ -5,14 +5,18 @@ import (
 )
 
 type SysUser struct {
-	ID        uint      `gorm:"primary_key" sql:"auto_increment;primary_key;unique" json:"id"`
-	CreatedAt time.Time `gorm:"column:create_time" json:"createTime" "not null VARCHAR(191)"`
-	UpdatedAt time.Time `gorm:"column:update_time" json:"updateTime" "not null VARCHAR(191)"`
-	Name      string    `gorm:"column:name" json:"name" "not null VARCHAR(191)"`
-	Username  string    `gorm:"column:username" json:"username" "not null VARCHAR(191)"`
-	Password  string    `gorm:"column:password" json:"password" "not null VARCHAR(191)"`
-	Phone     string    `gorm:"column:phone" json:"phone"`
-	RoleID    uint      `gorm:"column:role_id" json:"roleId"`
+	ID           uint      `gorm:"primary_key" sql:"auto_increment;primary_key;unique" json:"id"`
+	CreatedAt    time.Time `gorm:"column:create_time" json:"createTime" "not null VARCHAR(191)"`
+	UpdatedAt    time.Time `gorm:"column:update_time" json:"updateTime" "not null VARCHAR(191)"`
+	Name         string    `gorm:"column:name" json:"name" "not null VARCHAR(191)"`
+	Username     string    `gorm:"column:username" json:"username" "not null VARCHAR(191)"`
+	Password     string    `gorm:"column:password" json:"password" "not null VARCHAR(191)"` //md5加密
+	Phone        string    `gorm:"column:phone" json:"phone"`
+	Email        string    `gorm:"column:email" json:"email"`
+	HeadImg      string    `gorm:"column:head_img" json:"headImg"`
+	DepartmentId uint      `gorm:"column:department_id" json:"departmentId"`
+	Status       uint      `gorm:"column:status" json:"status"`
+	Remark       string    `gorm:"column:remark" json:"remark"`
 }
 
 type UserJson struct {
