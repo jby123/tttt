@@ -14,8 +14,8 @@ import (
  * @param  {[type]} offset int    [description]
  * @param  {[type]} limit int    [description]
  */
-func FindDeptByPage(name, orderBy string, offset, limit int) (dept []*model.SysDepartment) {
-	if err := database.FindPage(database.SearchMap{"name": name}, orderBy, offset, limit).Find(&dept).Error; err != nil {
+func FindDeptByPage(name, order, sort string, offset, limit int) (dept []*model.SysDepartment) {
+	if err := database.FindPage(database.SearchMap{"name": name}, sort, sort, offset, limit).Find(&dept).Error; err != nil {
 		fmt.Printf("FindDeptByPage.Error:%s", err)
 	}
 	return

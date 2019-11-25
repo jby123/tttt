@@ -15,9 +15,9 @@ import (
  * @param  {[type]} offset int    [description]
  * @param  {[type]} limit int    [description]
  */
-func FindUserByPage(departmentId int, name, orderBy string, offset, limit int) (users []*model.SysUser) {
+func FindUserByPage(departmentId int, name, order, sort string, offset, limit int) (users []*model.SysUser) {
 	searchMap := database.SearchMap{"username": name, "department_id": departmentId}
-	if err := database.FindPage(searchMap, orderBy, offset, limit).Find(&users).Error; err != nil {
+	if err := database.FindPage(searchMap, order, sort, offset, limit).Find(&users).Error; err != nil {
 		fmt.Printf("FindByPage.Error:%s", err)
 	}
 	return
@@ -78,7 +78,6 @@ func CreateUser(aul *model.UserJson) (user *model.SysUser) {
 	user.Username = aul.Username
 	user.Password = hash
 	user.Name = aul.Name
-	user.RoleID = aul.RoleID
 
 	if err := database.GetDB().Create(user).Error; err != nil {
 		fmt.Printf("Create.Err:%s", err)

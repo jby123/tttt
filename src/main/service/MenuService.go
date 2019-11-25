@@ -14,8 +14,8 @@ import (
  * @param  {[type]} offset int    [description]
  * @param  {[type]} limit int    [description]
  */
-func FindMenuByPage(name, orderBy string, offset, limit int) (sysMenu []*model.SysMenu) {
-	if err := database.FindPage(database.SearchMap{"name": name}, orderBy, offset, limit).Find(&sysMenu).Error; err != nil {
+func FindMenuByPage(name, order, sort string, offset, limit int) (sysMenu []*model.SysMenu) {
+	if err := database.FindPage(database.SearchMap{"name": name}, sort, sort, offset, limit).Find(&sysMenu).Error; err != nil {
 		fmt.Printf("FindMenuByPage.Error:%s\n", err)
 	}
 	return

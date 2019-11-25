@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"goAdmin/src/main/controller/vo/req"
 	"goAdmin/src/main/service"
+	"goAdmin/src/main/utils"
 	"net/http"
 	"strconv"
 )
@@ -20,14 +21,17 @@ import (
  */
 func PageUsers() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-
 		basePageReq := req.ParsePageReq(ctx)
 		departmentIdStr := ctx.Query("departmentId")
-		departmentId, err := strconv.Atoi(departmentIdStr)
-
-		service.FindUserByPage(departmentId, basePageReq.KeyWord, basePageReq.Order, basePageReq.Page, basePageReq.Size)
-		ctx.Status(http.StatusOK)
-		ctx.JSON(http.StatusOK, nil)
+		var dept int
+		if len(departmentIdStr) > 0 {
+			departmentId, err := strconv.Atoi(departmentIdStr)
+			if err == nil {
+				dept = departmentId
+			}
+		}
+		users := service.FindUserByPage(dept, basePageReq.KeyWord, basePageReq.Order, basePageReq.Sort, basePageReq.Page, basePageReq.Size)
+		ctx.JSON(http.StatusOK, utils.Success(users))
 	}
 }
 

@@ -14,8 +14,8 @@ import (
  * @param  {[type]} offset int    [description]
  * @param  {[type]} limit int    [description]
  */
-func FindRoleByPage(name, orderBy string, offset, limit int) (sysRole []*model.SysRole) {
-	if err := database.FindPage(database.SearchMap{"name": name}, orderBy, offset, limit).Find(&sysRole).Error; err != nil {
+func FindRoleByPage(name, order, sort string, offset, limit int) (sysRole []*model.SysRole) {
+	if err := database.FindPage(database.SearchMap{"name": name}, sort, sort, offset, limit).Find(&sysRole).Error; err != nil {
 		fmt.Printf("FindRoleByPage.Error:%s\n", err)
 	}
 	return

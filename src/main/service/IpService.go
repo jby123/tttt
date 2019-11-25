@@ -15,8 +15,8 @@ import (
  * @param  {[type]} offset int    [description]
  * @param  {[type]} limit int    [description]
  */
-func FindIpByPage(name, orderBy string, offset, limit int) (sysIp []*model.SysIp) {
-	if err := database.FindPage(database.SearchMap{"ip": name}, orderBy, offset, limit).Find(&sysIp).Error; err != nil {
+func FindIpByPage(name, order, sort string, offset, limit int) (sysIp []*model.SysIp) {
+	if err := database.FindPage(database.SearchMap{"ip": name}, sort, sort, offset, limit).Find(&sysIp).Error; err != nil {
 		fmt.Printf("FindIpByPage.Error:%s", err)
 	}
 	return
