@@ -95,7 +95,16 @@ func FindPage(searchMap map[string]interface{}, order, sort string, offset, limi
 	}
 	return DBClient
 }
-
+func Count(searchMap map[string]interface{}, model interface{}) int {
+	DBClient.Model(&model)
+	searchSql, searchArgs := ParseSearchMap(searchMap)
+	if len(searchSql) > 0 {
+		DBClient = DBClient.Where(searchSql, searchArgs)
+	}
+	var count int = 0
+	DBClient.Count(&count)
+	return count
+}
 func ParseSearchMap(searchMap map[string]interface{}) (string, []interface{}) {
 	var querySql string
 	var index int = 0
