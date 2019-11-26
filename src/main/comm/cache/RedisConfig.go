@@ -1,6 +1,5 @@
 package cache
 
-
 import (
 	"fmt"
 	"github.com/go-redis/redis"
@@ -9,12 +8,11 @@ import (
 
 var redisClient *redis.Client
 
-
 //redis常量
 type RedisConfig struct {
-	Cache  CacheConf `yaml:"Cache"`
+	Cache Conf `yaml:"Cache"`
 }
-type CacheConf struct {
+type Conf struct {
 	Network string `yaml:"NetWork"` //连接类型 TCP
 	DB      int    `yaml:"DB"`
 	Host    string `yaml:"Host"`
@@ -23,9 +21,6 @@ type CacheConf struct {
 	MaxIdle int    `yaml:"maxIdle"`
 	MaxOpen int    `yaml:"maxOpen"`
 }
-
-
-
 
 // 初始化redis
 func InitRedis(conf *RedisConfig) (err error) {

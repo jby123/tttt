@@ -5,41 +5,60 @@ import (
 	"github.com/jameskeane/bcrypt"
 	"goAdmin/src/main/comm/database"
 	"goAdmin/src/main/model"
+	"goAdmin/src/main/utils"
 )
 
 /**
  * 分页获取用户列表
  * @method FindByPage
+ * @param  {[type]} departmentIds []int [description]
  * @param  {[type]} name string [description] 用户模糊查询
- * @param  {[type]} orderBy string [description]
- * @param  {[type]} offset int    [description]
- * @param  {[type]} limit int    [description]
+ * @param  {[type]} order string [description]
+ * @param  {[type]} sort string [description]
+ * @param  {[type]} pageNum int    [description]
+ * @param  {[type]} pageSize int    [description]
  */
-func FindUserByPage(departmentId int, name, order, sort string, offset, limit int) (users []*model.SysUser) {
-	searchMap := database.SearchMap{"username": name, "department_id": departmentId}
-	if err := database.FindPage(searchMap, order, sort, offset, limit).Find(&users).Error; err != nil {
-		fmt.Printf("FindByPage.Error:%s", err)
+func FindUserByPage(departmentIds []int, name, order, sort string, pageNum, pageSize int) (page *utils.PaginationVo) {
+	searchMap := make(map[string]interface{})
+	searchMap["username"] = name
+	if len(departmentIds) > 0 {
+		searchMap["department_id"] = departmentIds
 	}
-	return
+	var resultDataList []*model.SysUser
+	if err := database.FindPage(searchMap, order, sort, pageNum, pageSize).Find(&resultDataList).Error; err != nil {
+		fmt.Printf("FindByPage.Error:%s", err)
+		return utils.Pagination(resultDataList, pageNum, pageSize, 0)
+	}
+	total := database.Count(searchMap, &model.SysUser{})
+	return utils.Pagination(resultDataList, pageNum, pageSize, total)
+}
+
+func FindUserCount(departmentId int, name string) int {
+	searchMap := make(map[string]interface{})
+	searchMap["username"] = name
+	if departmentId > 0 {
+		searchMap["department_id"] = departmentId
+	}
+	return database.Count(searchMap, &model.SysUser{})
 }
 
 /**
  * 通过 id 获取 user 记录
- * @method GetById
+ * @method GetUserById
  * @param  {[type]}       user  *SysUser [description]
  */
-func GetUserById(id uint) *model.SysUser {
-	user := new(model.SysUser)
-	user.ID = id
-	if err := database.GetDB().First(user).Error; err != nil {
-		fmt.Printf("GetById.Err:%s", err)
+func GetUserById(id uint) (user *model.SysUser) {
+	user = new(model.SysUser)
+	err := database.GetById(id, user)
+	if err != nil {
+		fmt.Printf("getUserById.error.%s\n", err)
 	}
 	return user
 }
 
 /**
  * 通过 username 获取 user 记录
- * @method GetByUserName
+ * @method GetUserByUserName
  * @param  {[type]}       user  *SysUser [description]
  */
 func GetUserByUserName(username string) *model.SysUser {
@@ -53,37 +72,29 @@ func GetUserByUserName(username string) *model.SysUser {
 
 /**
  * 通过 id 删除用户
- * @method DeleteById
+ * @method DeleteUserById
  */
-func DeleteUserById(id uint) {
+func DeleteUserById(id uint) error {
 	u := new(model.SysUser)
-	u.ID = id
-	if err := database.GetDB().Delete(u).Error; err != nil {
-		fmt.Printf("DeleteById.Err:%s", err)
-	}
+	return database.DeleteById(id, u)
 }
 
 /**
  * 创建
- * @method Create
+ * @method CreateUser
  * @param  {[type]} kw string [description]
  * @param  {[type]} cp int    [description]
  * @param  {[type]} mp int    [description]
  */
-func CreateUser(aul *model.UserJson) (user *model.SysUser) {
+func CreateUser(sysUser *model.SysUser) error {
 	salt, _ := bcrypt.Salt(10)
-	hash, _ := bcrypt.Hash(aul.Password, salt)
-
-	user = new(model.SysUser)
-	user.Username = aul.Username
-	user.Password = hash
-	user.Name = aul.Name
-
-	if err := database.GetDB().Create(user).Error; err != nil {
-		fmt.Printf("Create.Err:%s", err)
+	hash, _ := bcrypt.Hash(sysUser.Password, salt)
+	sysUser.Password = hash
+	err := database.Create(sysUser)
+	if err != nil {
+		return err
 	}
-
-	return
+	return nil
 }
 
 /**
@@ -93,19 +104,16 @@ func CreateUser(aul *model.UserJson) (user *model.SysUser) {
  * @param  {[type]} cp int    [description]
  * @param  {[type]} mp int    [description]
  */
-func UpdateUser(uj *model.UserJson, id uint) *model.SysUser {
+func UpdateUser(sysUser *model.SysUser) error {
 	salt, _ := bcrypt.Salt(10)
-	hash, _ := bcrypt.Hash(uj.Password, salt)
+	hash, _ := bcrypt.Hash(sysUser.Password, salt)
+	sysUser.Password = hash
 
-	user := new(model.SysUser)
-	user.ID = id
-	uj.Password = hash
-
-	if err := database.GetDB().Model(user).Updates(uj).Error; err != nil {
-		fmt.Printf("Update.Err:%s", err)
+	err := database.Update(sysUser)
+	if err != nil {
+		return err
 	}
-
-	return user
+	return nil
 }
 
 /**

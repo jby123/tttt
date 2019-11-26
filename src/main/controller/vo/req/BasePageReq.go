@@ -21,6 +21,7 @@ func ParsePageReq(ctx *gin.Context) BasePageReq {
 	timeStr := ctx.Query("t")
 	sort := ctx.Query("sort")
 	order := ctx.Query("order")
+
 	page, err := strconv.Atoi(pageStr)
 	if err != nil {
 		page = 1

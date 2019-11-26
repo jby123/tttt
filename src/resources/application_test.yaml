@@ -11,3 +11,16 @@ DB:
   Username: root
   Password: zjj930716.
   Dialect: mysql
+
+#登入验证
+LoginValid:
+  IsValidCaptcha: true
+
+#通知
+Notify:
+  ErrorIsOpen: true
+  Email:
+    FromEmail: xfzandysw@163.com
+    EmailHost: smtp.163.com
+    EmailPort: 465
+    EmailPass: 123456

@@ -20,7 +20,7 @@ func startAdminApplication() (app *gin.Engine) {
 	//初始化环境配置
 	config.InitCommConfig(utils.DefaultDevelopmentRelativePath)
 	//初始化mysql
-	database.InitMysql(config.Config.EnvConf.ActiveConf.Active, &config.DbConf)
+	database.InitDB(config.Config.EnvConf.ActiveConf.Active, &config.DbConf)
 	//初始化redis
 	cache.InitRedis(&config.RedisConf)
 

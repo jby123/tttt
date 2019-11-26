@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 	"goAdmin/src/main/comm/cache"
-	"goAdmin/src/main/comm/config/notify"
+	"goAdmin/src/main/comm/config/comm"
 	"goAdmin/src/main/comm/database"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
@@ -38,7 +38,7 @@ var RedisConf cache.RedisConfig
 
 var DbConf database.DbConfig
 
-var NotifyConfig notify.Conf
+var CommConfig comm.Conf
 
 // 初始化解析参数
 var Path string
@@ -50,7 +50,7 @@ func PreInit(relativePath string) {
 }
 
 func InitActivePath(relativePath, activeEnv string) {
-	if len(activePath) <= 0 {
+	if len(activeEnv) <= 0 {
 		activeEnv = DefaultDevelopmentEnv
 	}
 	activePath = relativePath + "/application_" + activeEnv + ".yaml"
@@ -71,8 +71,8 @@ func InitCommConfig(relativePath string) error {
 	InitRedisConfig(relativePath)
 	//初始化db配置信息
 	InitDbConfig(relativePath)
-	//初始化通知配置信息
-	InitNotifyConfig(relativePath)
+	//初始化通用配置信息
+	InitBaseConfig(relativePath)
 	return err
 }
 func InitRedisConfig(relativePath string) error {
@@ -80,9 +80,11 @@ func InitRedisConfig(relativePath string) error {
 		InitCommConfig(relativePath)
 	}
 	content, err := ioutil.ReadFile(activePath)
-	if err == nil {
-		err = yaml.Unmarshal(content, &RedisConf)
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(-1)
 	}
+	err = yaml.Unmarshal(content, &RedisConf)
 	return err
 }
 
@@ -91,19 +93,21 @@ func InitDbConfig(relativePath string) error {
 		InitCommConfig(relativePath)
 	}
 	content, err := ioutil.ReadFile(activePath)
-	if err == nil {
-		err = yaml.Unmarshal(content, &DbConf)
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(-1)
 	}
+	err = yaml.Unmarshal(content, &DbConf)
 	return err
 }
 
-func InitNotifyConfig(relativePath string) error {
+func InitBaseConfig(relativePath string) error {
 	if len(Path) == 0 {
 		InitCommConfig(relativePath)
 	}
 	content, err := ioutil.ReadFile(activePath)
 	if err == nil {
-		err = yaml.Unmarshal(content, &NotifyConfig)
+		err = yaml.Unmarshal(content, &CommConfig)
 	}
 	return err
 }

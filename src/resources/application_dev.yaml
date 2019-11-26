@@ -12,6 +12,11 @@ DB:
   Password: zjj930716.
   Dialect: mysql
 
+#登入验证
+LoginValid:
+  IsValidCaptcha: false
+
+#通知
 Notify:
   ErrorIsOpen: false
   Email:

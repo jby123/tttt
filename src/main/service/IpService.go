@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"goAdmin/src/main/comm/database"
 	"goAdmin/src/main/model"
+	"goAdmin/src/main/utils"
 	"strconv"
 )
 
@@ -11,15 +12,21 @@ import (
  * 分页获取黑白名单列表
  * @method FindIpByPage
  * @param  {[type]} name string [description]
- * @param  {[type]} orderBy string [description]
- * @param  {[type]} offset int    [description]
- * @param  {[type]} limit int    [description]
+ * @param  {[type]} order string [description]
+ * @param  {[type]} sort string [description]
+ * @param  {[type]} pageNum int    [description]
+ * @param  {[type]} pageSize int    [description]
  */
-func FindIpByPage(name, order, sort string, offset, limit int) (sysIp []*model.SysIp) {
-	if err := database.FindPage(database.SearchMap{"ip": name}, sort, sort, offset, limit).Find(&sysIp).Error; err != nil {
-		fmt.Printf("FindIpByPage.Error:%s", err)
+func FindIpByPage(name, order, sort string, pageNum, pageSize int) (page *utils.PaginationVo) {
+	searchMap := make(map[string]interface{})
+	searchMap["ip"] = name
+	var resultDataList []*model.SysIp
+	if err := database.FindPage(searchMap, sort, sort, pageNum, pageSize).Find(&resultDataList).Error; err != nil {
+		fmt.Printf("FindIpByPage.Error:%s\n", err)
+		return utils.Pagination(resultDataList, pageNum, pageSize, 0)
 	}
-	return
+	total := database.Count(searchMap, &model.SysIp{})
+	return utils.Pagination(resultDataList, pageNum, pageSize, total)
 }
 
 func FindIpList(ipType int) (sysIp []*model.SysIp) {

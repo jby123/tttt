@@ -7,6 +7,7 @@ import (
 	"goAdmin/src/main/utils"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 /**
@@ -22,20 +23,27 @@ import (
 func PageUsers() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		basePageReq := req.ParsePageReq(ctx)
-		departmentIdStr := ctx.Query("departmentId")
-		var dept int
-		if len(departmentIdStr) > 0 {
-			departmentId, err := strconv.Atoi(departmentIdStr)
-			if err == nil {
-				dept = departmentId
+		var deptIdList []int
+		if departmentIdsStr, isExist := ctx.GetQuery("departmentIds"); isExist {
+			if len(departmentIdsStr) > 0 {
+				var departmentIds []string = strings.Split(departmentIdsStr, ",")
+				deptIdList = make([]int, len(departmentIds))
+				var index int = 0
+				for _, departmentIdStr := range departmentIds {
+					departmentId, err := strconv.Atoi(departmentIdStr)
+					if err == nil {
+						deptIdList[index] = departmentId
+					}
+					index++
+				}
 			}
 		}
-		users := service.FindUserByPage(dept, basePageReq.KeyWord, basePageReq.Order, basePageReq.Sort, basePageReq.Page, basePageReq.Size)
-		ctx.JSON(http.StatusOK, utils.Success(users))
+		page := service.FindUserByPage(deptIdList, basePageReq.KeyWord, basePageReq.Order, basePageReq.Sort, basePageReq.Page, basePageReq.Size)
+		ctx.JSON(http.StatusOK, utils.Success(page))
 	}
 }
 
-func GetAllUsers() gin.HandlerFunc {
+func ListUsers() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		ctx.Status(http.StatusOK)
 		ctx.JSON(http.StatusOK, nil)

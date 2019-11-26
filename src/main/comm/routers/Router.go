@@ -47,14 +47,14 @@ func RegisterRoute(application *gin.Engine) {
 	{
 		log := sys.Group("/log")
 		log.Use(middleware.AuthorizationHandler())
-		log.GET("/page", controller.LogPage())
+		log.GET("/page", controller.PageLogs())
 	}
 	//用户api
 	{
 		user := sys.Group("/user")
 		user.Use(middleware.AuthorizationHandler())
 		user.GET("/page", controller.PageUsers())
-		user.GET("/list", controller.GetAllUsers())
+		user.GET("/list", controller.ListUsers())
 		user.GET("/info", controller.GetUser())
 		user.POST("/add", controller.CreateUser())
 		user.POST("/update", controller.UpdateUser())
@@ -64,19 +64,19 @@ func RegisterRoute(application *gin.Engine) {
 	{
 		role := sys.Group("/role")
 		role.Use(middleware.AuthorizationHandler())
-		role.GET("/page", nil)
-		role.GET("/list", nil)
+		role.GET("/page", controller.PageRoles())
+		role.GET("/list", controller.ListRoles())
 		role.GET("/info", nil)
 		role.POST("/add", nil)
 		role.POST("/update", nil)
 		role.POST("/delete", nil)
 	}
-	//角色 api
+	//菜单 api
 	{
 		menu := sys.Group("/menu")
 		menu.Use(middleware.AuthorizationHandler())
-		menu.GET("/page", nil)
-		menu.GET("/list", nil)
+		menu.GET("/page", controller.PageMenus())
+		menu.GET("/list", controller.ListMenus())
 		menu.GET("/info", nil)
 		menu.POST("/add", nil)
 		menu.POST("/update", nil)
@@ -86,8 +86,8 @@ func RegisterRoute(application *gin.Engine) {
 	{
 		department := sys.Group("/department")
 		department.Use(middleware.AuthorizationHandler())
-		department.GET("/page", nil)
-		department.GET("/list", nil)
+		department.GET("/page", controller.PageDepartments())
+		department.GET("/list", controller.ListDepartments())
 		department.GET("/info", nil)
 		department.POST("/add", nil)
 		department.POST("/update", nil)

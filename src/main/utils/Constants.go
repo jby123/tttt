@@ -4,7 +4,7 @@ import "time"
 
 const AppName = "goAdmin"
 const DefaultDevelopmentRelativePath = "./src/resources"
-const DefaultTestRelativePath = "./src/test/resources"
+const DefaultTestRelativePath = "E:\\go_project\\goAdmin\\src\\test\\resources"
 const DefaultDevelopmentEnv = "dev"
 
 const DefaultCaptchaLen = 4

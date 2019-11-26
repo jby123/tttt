@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"goAdmin/src/main/service"
 	"goAdmin/src/main/utils"
 	"net/http"
 )
@@ -31,8 +32,11 @@ func CurrentUserInfo() gin.HandlerFunc {
 			ctx.JSON(http.StatusOK, utils.Error(utils.BUSINESS_ERROR, "获取不到当前用户信息.[system.get.claims.not.exist]", nil))
 			return
 		}
-		customClaims := claimsData.(utils.CustomClaims)
+		customClaims := claimsData.(*utils.CustomClaims)
+
 		fmt.Println("CurrentUserInfo.claims....userId", customClaims.ID)
+
+		ctx.JSON(http.StatusOK, utils.Success(service.GetUserById(customClaims.ID)))
 	}
 }
 

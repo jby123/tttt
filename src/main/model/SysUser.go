@@ -19,6 +19,8 @@ type SysUser struct {
 	Remark       string    `gorm:"column:remark" json:"remark"`
 }
 
+const SysUserTableName = "sys_user"
+
 type UserJson struct {
 	Username string `json:"username" validate:"required,gte=2,lte=50"`
 	Password string `json:"password" validate:"required"`

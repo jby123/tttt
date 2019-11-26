@@ -28,8 +28,8 @@ type MysqlConf struct {
 	MaxOpen    int    `yaml:"maxOpen"`
 }
 
-// 初始化mysql
-func InitMysql(activeEnv string, dbConfig *DbConfig) (err error) {
+// 初始化 DB 连接
+func InitDB(activeEnv string, dbConfig *DbConfig) (err error) {
 	DBClient, err = gorm.Open(dbConfig.Db.Dialect, dbConfig.Db.Url)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -68,7 +68,7 @@ type SearchMap map[string]interface{}
  * @param  {[type]} searchMap map[string] interface{}    [description]
 * @param  {[type]} searchValue string    [description]
 * @param  {[type]} order string    [description]
- * @param  {[type]} orderBy string    [description]
+ * @param  {[type]} sort string    [description]
  * @param  {[type]} relation string    [description]
  * @param  {[type]} offset int    [description]
  * @param  {[type]} limit int    [description]
@@ -79,7 +79,7 @@ func FindPage(searchMap map[string]interface{}, order, sort string, offset, limi
 		sort = "desc"
 	}
 	if len(order) <= 0 {
-		order = "created_at"
+		order = "create_time"
 	}
 	DBClient = DBClient.Order(" " + order + " " + sort + " ")
 
@@ -95,31 +95,83 @@ func FindPage(searchMap map[string]interface{}, order, sort string, offset, limi
 	}
 	return DBClient
 }
-func Count(searchMap map[string]interface{}, model interface{}) int {
-	DBClient.Model(&model)
+
+func FindListByParam(searchMap map[string]interface{}, resultDataList interface{}) error {
 	searchSql, searchArgs := ParseSearchMap(searchMap)
 	if len(searchSql) > 0 {
 		DBClient = DBClient.Where(searchSql, searchArgs)
 	}
-	var count int = 0
-	DBClient.Count(&count)
-	return count
+	if err := DBClient.Find(resultDataList).Error; err != nil {
+		fmt.Printf("FindListByParam.Err:%s\n", err)
+		return err
+	}
+	return nil
 }
+
+func Count(searchMap map[string]interface{}, model interface{}) int {
+	DBClient = DBClient.Model(model)
+	searchSql, searchArgs := ParseSearchMap(searchMap)
+	if len(searchSql) > 0 {
+		DBClient = DBClient.Where(searchSql, searchArgs)
+	}
+	var total int = 0
+	DBClient.Count(&total)
+	return total
+}
+
+/**
+ * 通过 id 获取记录
+ * @method GetById
+ * @param  {[type]} model interface{} [description]
+ */
+func GetById(id uint, model interface{}) error {
+	if err := DBClient.Where("id = ?", id).First(model).Error; err != nil {
+		fmt.Printf("GetById.Err:%s\n", err)
+		return err
+	}
+	return nil
+}
+
+func DeleteById(id uint, model interface{}) error {
+	if err := DBClient.Where("id = ?", id).Delete(model).Error; err != nil {
+		fmt.Printf("DeleteById.Err:%s\n", err)
+		return err
+	}
+	return nil
+}
+
+func Create(model interface{}) error {
+	if err := DBClient.Create(model).Error; err != nil {
+		fmt.Printf("Create.Err:%s\n", err)
+		return err
+	}
+	return nil
+}
+
+func Update(model interface{}) error {
+	if err := DBClient.Update(model).Error; err != nil {
+		fmt.Printf("Update.Err:%s\n", err)
+		return err
+	}
+	return nil
+}
+
 func ParseSearchMap(searchMap map[string]interface{}) (string, []interface{}) {
 	var querySql string
 	var index int = 0
-	var queryArgs []interface{}
+	queryArgs := make([]interface{}, len(searchMap))
 	for searchKey, searchValue := range searchMap {
-		fmt.Println("searchValue", searchValue)
 		if len(searchKey) > 0 {
 			switch vv := searchValue.(type) {
 			case string:
-				if len(querySql) == 0 {
-					querySql += " " + searchKey + " LIKE  ? "
-				} else {
-					querySql += " AND " + searchKey + " LIKE  ? "
+				if len(vv) > 0 {
+					if len(querySql) == 0 {
+						querySql += " " + searchKey + " LIKE  ? "
+					} else {
+						querySql += " AND " + searchKey + " LIKE  ? "
+					}
+					queryArgs[index] = searchValue
 				}
-				queryArgs[index] = searchValue
 			case float64:
 				if len(querySql) == 0 {
 					querySql += " " + searchKey + " =  ? "
@@ -142,18 +194,20 @@ func ParseSearchMap(searchMap map[string]interface{}) (string, []interface{}) {
 				}
 				queryArgs[index] = searchValue
 			case []interface{}:
-				var stringSlice []string
-				for _, u := range vv {
-					stringSlice = append(stringSlice, u.(string))
-				}
-				values := strings.Join(stringSlice, "_")
-				if len(values) > 0 {
-					if len(querySql) == 0 {
-						querySql += " " + searchKey + " in (?) "
-					} else {
-						querySql += " AND " + searchKey + " in (?) "
+				if len(vv) > 0 {
+					var stringSlice []string
+					for _, u := range vv {
+						stringSlice = append(stringSlice, u.(string))
 					}
-					queryArgs[index] = values
+					values := strings.Join(stringSlice, "_")
+					if len(values) > 0 {
+						if len(querySql) == 0 {
+							querySql += " " + searchKey + " in (?) "
+						} else {
+							querySql += " AND " + searchKey + " in (?) "
+						}
+						queryArgs[index] = values
+					}
 				}
 			case nil:
 				if len(querySql) == 0 {

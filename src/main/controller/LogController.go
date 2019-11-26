@@ -2,15 +2,19 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"goAdmin/src/main/controller/vo/req"
+	"goAdmin/src/main/service"
+	"goAdmin/src/main/utils"
 	"net/http"
 )
 
 /**
  * 分页获取日志列表
  */
-func LogPage() gin.HandlerFunc {
+func PageLogs() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		ctx.Status(http.StatusOK)
-		ctx.JSON(http.StatusOK, nil)
+		basePageReq := req.ParsePageReq(ctx)
+		page := service.FindLogByPage(basePageReq.KeyWord, basePageReq.Order, basePageReq.Sort, basePageReq.Page, basePageReq.Size)
+		ctx.JSON(http.StatusOK, utils.Success(page))
 	}
 }

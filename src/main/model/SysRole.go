@@ -12,3 +12,5 @@ type SysRole struct {
 	Status    uint      `gorm:"column:status" json:"status"`
 	Remark    string    `gorm:"column:remark" json:"remark"`
 }
+
+const SysRoleTableName = "sys_role"

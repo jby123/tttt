@@ -5,6 +5,7 @@ import (
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/mojocn/base64Captcha"
+	"goAdmin/src/main/comm/config"
 	"goAdmin/src/main/model"
 	"goAdmin/src/main/service"
 	"goAdmin/src/main/utils"
@@ -15,7 +16,7 @@ type LoginReq struct {
 	CaptchaId  string `json:"captchaId" binding:"required"`
 	Password   string `json:"password" binding:"required"`
 	Username   string `json:"username" binding:"required"`
-	VerifyCode string `json:"verifyCode" binding:"required"`
+	VerifyCode string `json:"verifyCode"`
 }
 
 type LoginRespVo struct {
@@ -36,12 +37,20 @@ func Login() gin.HandlerFunc {
 			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
 			return
 		}
-		//比较验证码
-		verifyResult := base64Captcha.VerifyCaptcha(loginReq.CaptchaId, loginReq.VerifyCode)
-		if !verifyResult {
-			ctx.JSON(http.StatusOK, utils.Error(utils.BUSINESS_ERROR, "验证码错误", nil))
-			return
+		if config.CommConfig.LoginValid.IsValidCaptcha {
+			if len(loginReq.CaptchaId) <= 0 {
+				ctx.Status(http.StatusBadRequest)
+				ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "验证码不能为空", nil))
+				return
+			}
+			//比较验证码
+			verifyResult := base64Captcha.VerifyCaptcha(loginReq.CaptchaId, loginReq.VerifyCode)
+			if !verifyResult {
+				ctx.JSON(http.StatusOK, utils.Error(utils.BUSINESS_ERROR, "验证码错误", nil))
+				return
+			}
 		}
+
 		status, user, error := service.Login(loginReq.Username, loginReq.Password)
 		if error != nil {
 			fmt.Printf("\n login.error.{%s}\n", error)
