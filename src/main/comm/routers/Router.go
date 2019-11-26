@@ -46,13 +46,12 @@ func RegisterRoute(application *gin.Engine) {
 	//日志api
 	{
 		log := sys.Group("/log")
-		log.Use(middleware.AuthorizationHandler())
-		log.GET("/page", controller.PageLogs())
+		log.GET("/page", middleware.AuthorizationHandler("sys:log:page"), controller.PageLogs())
 	}
 	//用户api
 	{
 		user := sys.Group("/user")
-		user.Use(middleware.AuthorizationHandler())
+		user.Use(middleware.AuthorizationHandler(""))
 		user.GET("/page", controller.PageUsers())
 		user.GET("/list", controller.ListUsers())
 		user.GET("/info", controller.GetUser())
@@ -63,7 +62,7 @@ func RegisterRoute(application *gin.Engine) {
 	//角色 api
 	{
 		role := sys.Group("/role")
-		role.Use(middleware.AuthorizationHandler())
+		role.Use(middleware.AuthorizationHandler(""))
 		role.GET("/page", controller.PageRoles())
 		role.GET("/list", controller.ListRoles())
 		role.GET("/info", nil)
@@ -74,7 +73,7 @@ func RegisterRoute(application *gin.Engine) {
 	//菜单 api
 	{
 		menu := sys.Group("/menu")
-		menu.Use(middleware.AuthorizationHandler())
+		menu.Use(middleware.AuthorizationHandler(""))
 		menu.GET("/page", controller.PageMenus())
 		menu.GET("/list", controller.ListMenus())
 		menu.GET("/info", nil)
@@ -85,7 +84,7 @@ func RegisterRoute(application *gin.Engine) {
 	//部门 api
 	{
 		department := sys.Group("/department")
-		department.Use(middleware.AuthorizationHandler())
+		department.Use(middleware.AuthorizationHandler(""))
 		department.GET("/page", controller.PageDepartments())
 		department.GET("/list", controller.ListDepartments())
 		department.GET("/info", nil)
