@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"goAdmin/src/main/controller/vo/req"
 	"goAdmin/src/main/service"
@@ -62,8 +63,20 @@ func ListUsers() gin.HandlerFunc {
  */
 func GetUser() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		idStr, _ := ctx.GetQuery("id")
+		if len(idStr) <= 0 {
+			ctx.Status(http.StatusBadRequest)
+			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
+			return
+		}
+		userId, err := strconv.Atoi(idStr)
+		if err != nil {
+			ctx.Status(http.StatusBadRequest)
+			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
+			return
+		}
 		ctx.Status(http.StatusOK)
-		ctx.JSON(http.StatusOK, nil)
+		ctx.JSON(http.StatusOK, service.GetUserById(uint(userId)))
 	}
 }
 
@@ -117,6 +130,24 @@ func UpdateUser() gin.HandlerFunc {
  */
 func DeleteUser() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		var deleteReq req.BaseDeleteReq
+		error := ctx.BindJSON(&deleteReq)
+		if error != nil {
+			fmt.Printf("DeleteUser.bind.error.%s \n", error)
+			ctx.Status(http.StatusBadRequest)
+			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
+			return
+		}
+
+		if len(deleteReq.Ids) > 0 {
+			var userIds []string = strings.Split(deleteReq.Ids, ",")
+			for _, userIdStr := range userIds {
+				userId, err := strconv.Atoi(userIdStr)
+				if err == nil {
+					service.DeleteUserById(uint(userId))
+				}
+			}
+		}
 		ctx.Status(http.StatusOK)
 		ctx.JSON(http.StatusOK, nil)
 	}

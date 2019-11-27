@@ -30,9 +30,9 @@ func RegisterRoute(application *gin.Engine) {
 	comm := route.Group("/comm")
 	//公共业务块api
 	{
-		comm.GET("/captcha", controller.Captcha())             //获取验证码
-		comm.GET("/verifyCaptcha", controller.VerifyCaptcha()) //验证-验证码
-		comm.POST("/login", controller.Login())                //登入
+		comm.POST("/login", controller.Login())    //登入
+		comm.GET("/captcha", controller.Captcha()) //获取验证码
+		//comm.GET("/verifyCaptcha", controller.VerifyCaptcha()) //验证-验证码
 
 		//登入后 获取  [需要校验token]
 		comm.GET("/permmenu", middleware.AuthTokenHandler(), controller.CurrentAuthorizationMenus())

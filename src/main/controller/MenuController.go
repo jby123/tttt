@@ -6,6 +6,7 @@ import (
 	"goAdmin/src/main/service"
 	"goAdmin/src/main/utils"
 	"net/http"
+	"strconv"
 )
 
 /**
@@ -24,5 +25,44 @@ func ListMenus() gin.HandlerFunc {
 		searchMap := make(map[string]interface{})
 		_, resultDataList := service.FindMenuListByParam(searchMap)
 		ctx.JSON(http.StatusOK, utils.Success(resultDataList))
+	}
+}
+func GetMenu() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		idStr, _ := ctx.GetQuery("id")
+		if len(idStr) <= 0 {
+			ctx.Status(http.StatusBadRequest)
+			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
+			return
+		}
+		menuId, err := strconv.Atoi(idStr)
+		if err != nil {
+			ctx.Status(http.StatusBadRequest)
+			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
+			return
+		}
+		ctx.Status(http.StatusOK)
+		ctx.JSON(http.StatusOK, service.GetMenuById(uint(menuId)))
+	}
+}
+
+func CreateMenu() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		ctx.Status(http.StatusOK)
+		ctx.JSON(http.StatusOK, nil)
+	}
+}
+
+func UpdateMenu() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		ctx.Status(http.StatusOK)
+		ctx.JSON(http.StatusOK, nil)
+	}
+}
+
+func DeleteMenu() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		ctx.Status(http.StatusOK)
+		ctx.JSON(http.StatusOK, nil)
 	}
 }

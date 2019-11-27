@@ -34,3 +34,24 @@ func FindRoleListByParam(searchMap map[string]interface{}) (err error, resultDat
 	}
 	return err, resultDataList
 }
+
+func GetRoleById(id uint) (resultData *model.SysRole) {
+	resultData = new(model.SysRole)
+	err := database.GetById(id, resultData)
+	if err != nil {
+		fmt.Printf("GetRoleById.error.%s\n", err)
+	}
+	return resultData
+}
+
+func DeleteRoleById(id uint) {
+	u := new(model.SysRole)
+	err := database.DeleteById(id, u)
+	if err != nil {
+		return
+	}
+	searchMap := make(map[string]interface{})
+	searchMap["role_id"] = id
+	DeleteRoleMenuByParams(searchMap)
+
+}

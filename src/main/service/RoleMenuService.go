@@ -17,3 +17,7 @@ func FindRoleMenuListByRoleIds(roleIds []uint) (resultDataList []*model.SysRoleM
 	}
 	return resultDataList, nil
 }
+
+func DeleteRoleMenuByParams(searchMap map[string]interface{}) {
+	//TODO
+}
