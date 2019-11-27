@@ -35,3 +35,24 @@ func FindMenuListByParam(searchMap map[string]interface{}) (err error, resultDat
 	}
 	return err, resultDataList
 }
+
+func GetMenuById(id uint) (resultData *model.SysMenu) {
+	resultData = new(model.SysMenu)
+	err := database.GetById(id, resultData)
+	if err != nil {
+		fmt.Printf("GetMenuById.error.%s\n", err)
+	}
+	return resultData
+}
+
+func DeleteMenuById(id uint) {
+	u := new(model.SysMenu)
+	err := database.DeleteById(id, u)
+	if err != nil {
+		return
+	}
+	searchMap := make(map[string]interface{})
+	searchMap["menu_id"] = id
+	DeleteRoleMenuByParams(searchMap)
+
+}

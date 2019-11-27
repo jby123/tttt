@@ -41,6 +41,9 @@ func InitDB(activeEnv string, dbConfig *DbConfig) (err error) {
 	DBClient.DB().SetMaxIdleConns(dbConfig.Db.MaxIdle)
 	DBClient.DB().SetMaxOpenConns(dbConfig.Db.MaxOpen)
 	DBClient.DB().SetConnMaxLifetime(time.Duration(30) * time.Minute)
+	//注册 db回调钩子操作
+	DBClient.Callback().Create().Replace("gorm:create_time", updateTimeStampForCreateCallback)
+	DBClient.Callback().Update().Replace("gorm:update_time", updateTimeStampForUpdateCallback)
 	err = DBClient.DB().Ping()
 	/**
 	 *禁用表名复数>
@@ -53,6 +56,31 @@ func InitDB(activeEnv string, dbConfig *DbConfig) (err error) {
 	 */
 	DBClient.SingularTable(true)
 	return
+}
+
+// updateTimeStampForCreateCallback will set `CreatedOn`, `ModifiedOn` when creating
+func updateTimeStampForCreateCallback(scope *gorm.Scope) {
+	if !scope.HasError() {
+		nowTime := time.Now().Unix()
+		if createTimeField, ok := scope.FieldByName("CreatedAt"); ok {
+			if createTimeField.IsBlank {
+				createTimeField.Set(nowTime)
+			}
+		}
+
+		if modifyTimeField, ok := scope.FieldByName("UpdatedAt"); ok {
+			if modifyTimeField.IsBlank {
+				modifyTimeField.Set(nowTime)
+			}
+		}
+	}
+}
+
+// updateTimeStampForUpdateCallback will set `ModifyTime` when updating
+func updateTimeStampForUpdateCallback(scope *gorm.Scope) {
+	if _, ok := scope.Get("gorm:update_column"); !ok {
+		scope.SetColumn("UpdatedAt", time.Now().Unix())
+	}
 }
 
 // 获取mysql连接

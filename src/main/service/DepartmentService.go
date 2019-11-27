@@ -35,3 +35,24 @@ func FindDeptListByParam(searchMap map[string]interface{}) (err error, resultDat
 	}
 	return err, resultDataList
 }
+
+func GetDeptById(id uint) (resultData *model.SysDepartment) {
+	resultData = new(model.SysDepartment)
+	err := database.GetById(id, resultData)
+	if err != nil {
+		fmt.Printf("GetDeptById.error.%s\n", err)
+	}
+	return resultData
+}
+
+func DeleteDeptById(id uint) {
+	u := new(model.SysDepartment)
+	err := database.DeleteById(id, u)
+	if err != nil {
+		return
+	}
+	searchMap := make(map[string]interface{})
+	searchMap["department_id"] = id
+	DeleteUserByParams(searchMap)
+
+}

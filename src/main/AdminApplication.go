@@ -30,6 +30,7 @@ func startAdminApplication() (app *gin.Engine) {
 	database.GetDB().AutoMigrate(
 		&model.SysUser{},
 		&model.SysLog{},
+		&model.SysIp{},
 		&model.SysDepartment{},
 		&model.SysRole{},
 		&model.SysMenu{},
