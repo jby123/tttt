@@ -6,11 +6,10 @@ import (
 	"goAdmin/src/main/model"
 )
 
-func FindRoleMenuListByRoleIds(roleIds []uint) (resultDataList []*model.SysRoleMenu, err error) {
-	if len(roleIds) == 0 {
-		return
-	}
-	err = database.FindListByParam(database.SearchMap{"role_id": roleIds}, resultDataList)
+func FindRoleMenuListByRoleIds(roleIds []uint) ([]*model.SysRoleMenu, error) {
+
+	var resultDataList []*model.SysRoleMenu
+	err := database.FindListByParam(database.SearchMap{"role_id": roleIds}, &resultDataList)
 	if err != nil {
 		fmt.Printf("FindUserRoleListById.error.%s\n", err)
 		return nil, err
