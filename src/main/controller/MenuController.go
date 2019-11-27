@@ -1,12 +1,14 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"goAdmin/src/main/controller/vo/req"
 	"goAdmin/src/main/service"
 	"goAdmin/src/main/utils"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 /**
@@ -62,6 +64,24 @@ func UpdateMenu() gin.HandlerFunc {
 
 func DeleteMenu() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		var deleteReq req.BaseDeleteReq
+		error := ctx.BindJSON(&deleteReq)
+		if error != nil {
+			fmt.Printf("DeleteMenu.bind.error.%s \n", error)
+			ctx.Status(http.StatusBadRequest)
+			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
+			return
+		}
+
+		if len(deleteReq.Ids) > 0 {
+			var menuIds []string = strings.Split(deleteReq.Ids, ",")
+			for _, menuIdStr := range menuIds {
+				menuId, err := strconv.Atoi(menuIdStr)
+				if err == nil {
+					service.DeleteMenuById(uint(menuId))
+				}
+			}
+		}
 		ctx.Status(http.StatusOK)
 		ctx.JSON(http.StatusOK, nil)
 	}

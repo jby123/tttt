@@ -44,3 +44,15 @@ func GetDeptById(id uint) (resultData *model.SysDepartment) {
 	}
 	return resultData
 }
+
+func DeleteDeptById(id uint) {
+	u := new(model.SysDepartment)
+	err := database.DeleteById(id, u)
+	if err != nil {
+		return
+	}
+	searchMap := make(map[string]interface{})
+	searchMap["department_id"] = id
+	DeleteUserByParams(searchMap)
+
+}

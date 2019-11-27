@@ -70,6 +70,10 @@ func GetUserByUserName(username string) *model.SysUser {
 	return user
 }
 
+func DeleteUserByParams(searchMap map[string]interface{}) {
+	//TODO
+}
+
 /**
  * 通过 id 删除用户
  * @method DeleteUserById

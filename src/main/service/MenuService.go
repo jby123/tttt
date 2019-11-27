@@ -44,3 +44,15 @@ func GetMenuById(id uint) (resultData *model.SysMenu) {
 	}
 	return resultData
 }
+
+func DeleteMenuById(id uint) {
+	u := new(model.SysMenu)
+	err := database.DeleteById(id, u)
+	if err != nil {
+		return
+	}
+	searchMap := make(map[string]interface{})
+	searchMap["menu_id"] = id
+	DeleteRoleMenuByParams(searchMap)
+
+}

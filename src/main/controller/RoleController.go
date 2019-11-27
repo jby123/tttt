@@ -68,7 +68,7 @@ func DeleteRole() gin.HandlerFunc {
 		var deleteReq req.BaseDeleteReq
 		error := ctx.BindJSON(&deleteReq)
 		if error != nil {
-			fmt.Printf("DeleteUser.bind.error.%s \n", error)
+			fmt.Printf("DeleteRole.bind.error.%s \n", error)
 			ctx.Status(http.StatusBadRequest)
 			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
 			return
