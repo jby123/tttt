@@ -1,0 +1,22 @@
+Cache:
+  NetWork: tcp
+  Host: 127.0.0.1
+  Post: 6379
+  Pwd:
+
+DB:
+  Url: ./db/sqlite/cool_admin.db
+  Dialect: sqlite3
+
+#登入验证
+LoginValid:
+  IsValidCaptcha: false
+
+#通知
+Notify:
+  ErrorIsOpen: false
+  Email:
+    FromEmail: xfzandysw@163.com
+    EmailHost: smtp.163.com
+    EmailPort: 465
+    EmailPass: 123456

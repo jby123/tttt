@@ -17,6 +17,26 @@ type SysUser struct {
 	DepartmentId uint      `gorm:"column:department_id" json:"departmentId"`
 	Status       uint      `gorm:"column:status" json:"status"`
 	Remark       string    `gorm:"column:remark" json:"remark"`
+
+	RoleName       string `gorm:"column:role_name" json:"roleName"`
+	DepartmentName string `gorm:"column:department_name" json:"departmentName"`
+}
+
+type SysUserVo struct {
+	ID             uint      `json:"id"`
+	CreatedAt      time.Time `json:"createTime"`
+	UpdatedAt      time.Time `json:"updateTime"`
+	Name           string    `json:"name"`
+	Username       string    `json:"username"`
+	Password       string    `json:"password"` //md5加密
+	Phone          string    `json:"phone"`
+	Email          string    `json:"email"`
+	HeadImg        string    `json:"headImg"`
+	DepartmentId   uint      `json:"departmentId"`
+	Status         uint      `json:"status"`
+	Remark         string    `json:"remark"`
+	RoleName       string    `json:"roleName"`
+	DepartmentName string    `json:"departmentName"`
 }
 
 const SysUserTableName = "sys_user"

@@ -35,7 +35,6 @@ func startAdminApplication() (app *gin.Engine) {
 		&model.SysRole{},
 		&model.SysMenu{},
 		&model.SysRoleMenu{},
-		&model.SysUserDept{},
 		&model.SysUserRole{},
 	)
 	routers.RegisterRoute(app)

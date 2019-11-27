@@ -25,7 +25,9 @@ func FindUserByPage(departmentIds []int, name, order, sort string, pageNum, page
 		searchMap["department_id"] = departmentIds
 	}
 	var resultDataList []*model.SysUser
-	if err := database.FindPage(searchMap, order, sort, pageNum, pageSize).Find(&resultDataList).Error; err != nil {
+
+	err := database.FindPage(searchMap, order, sort, pageNum, pageSize).Model(&model.SysUser{}).Joins("LEFT JOIN sys_user_role  ON sys_user.id = sys_user_role.user_id").Joins("LEFT JOIN sys_role  ON sys_user_role.role_id = sys_role.id").Joins("LEFT JOIN sys_department  ON sys_department.id = sys_user.department_id").Group("sys_user.id").Select("sys_user.*,GROUP_CONCAT(sys_role.name) AS role_name,sys_department.name as department_name").Find(&resultDataList).Error
+	if err != nil {
 		fmt.Printf("FindByPage.Error:%s", err)
 		return utils.Pagination(resultDataList, pageNum, pageSize, 0)
 	}

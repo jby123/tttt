@@ -49,6 +49,7 @@ func DeleteDeptById(id uint) {
 	u := new(model.SysDepartment)
 	err := database.DeleteById(id, u)
 	if err != nil {
+		fmt.Printf("DeleteDeptById.error.deptId:%d, error:%s\n", id, err)
 		return
 	}
 	searchMap := make(map[string]interface{})
