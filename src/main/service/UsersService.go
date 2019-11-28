@@ -32,7 +32,7 @@ func FindUserByPage(departmentIds []int, name, order, sort string, pageNum, page
 	if total == 0 {
 		return utils.Pagination(resultDataList, pageNum, pageSize, 0)
 	}
-	var sql string = ` SELECT u.*, GROUP_CONCAT(r.name) AS roleName, d.name AS departmentName `
+	var sql string = ` SELECT u.*, GROUP_CONCAT(r.name) AS role_name, d.name AS department_name `
 	sql += ` FROM sys_user AS u `
 	sql += ` LEFT JOIN sys_user_role AS ur ON u.id = ur.user_id `
 	sql += ` LEFT JOIN sys_role AS r ON ur.role_id = r.id `
