@@ -3,6 +3,7 @@ package middleware
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"goAdmin/src/main/comm/config"
 	"goAdmin/src/main/service"
 	"goAdmin/src/main/utils"
 	"net/http"
@@ -19,6 +20,10 @@ import (
 func AuthorizationHandler(permission string) gin.HandlerFunc {
 	return func(context *gin.Context) {
 		fmt.Println("<<<<<<<<<<authorization.【" + permission + "】begin>>>>>>>>>>>>>>")
+
+		if !config.CommConfig.Valid.IsOpenAuthorization {
+			return
+		}
 		//解析 登入校驗後存入的用戶信息
 		claimsData, exists := context.Get("claims")
 		if !exists {

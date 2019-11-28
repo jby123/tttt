@@ -4,10 +4,7 @@ import (
 	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
-	"strconv"
-
 	"os"
-	"strings"
 	"time"
 )
 
@@ -107,7 +104,7 @@ func FindPage(searchMap map[string]interface{}, order, sort string, offset, limi
 	client := GetDB()
 	searchSql, searchArgs := ParseSearchMap(searchMap)
 	if len(searchSql) > 0 {
-		client = client.Where(searchSql, searchArgs)
+		client = client.Where(searchSql, searchArgs...)
 	}
 	if len(sort) <= 0 {
 		sort = "desc"
@@ -143,8 +140,9 @@ func Count(searchMap map[string]interface{}, model interface{}) int {
 	client = client.Model(model)
 	searchSql, searchArgs := ParseSearchMap(searchMap)
 	if len(searchSql) > 0 {
-		client = client.Where(searchSql, searchArgs)
+		client = client.Where(searchSql, searchArgs...)
 	}
+
 	var total int = 0
 	client.Count(&total)
 	return total
@@ -239,50 +237,47 @@ func ParseSearchMap(searchMap map[string]interface{}) (string, []interface{}) {
 				queryArgs = append(queryArgs, searchValue)
 			case []uint:
 				if len(vv) > 0 {
-					var stringSlice []string
+					var stringSlice []uint
 					for _, u := range vv {
-						stringSlice = append(stringSlice, strconv.Itoa(int(u)))
+						stringSlice = append(stringSlice, u)
 					}
-					values := strings.Join(stringSlice, ",")
-					if len(values) > 0 {
+					if len(stringSlice) > 0 {
 						if len(querySql) == 0 {
 							querySql += " " + searchKey + " in (?) "
 						} else {
 							querySql += " AND " + searchKey + " in (?) "
 						}
-						queryArgs = append(queryArgs, values)
+						queryArgs = append(queryArgs, stringSlice)
 					}
 				}
 			case []int:
 				if len(vv) > 0 {
-					var stringSlice []string
+					var stringSlice []int
 					for _, u := range vv {
-						stringSlice = append(stringSlice, strconv.Itoa(u))
+						stringSlice = append(stringSlice, u)
 					}
-					values := strings.Join(stringSlice, ",")
-					if len(values) > 0 {
+					if len(stringSlice) > 0 {
 						if len(querySql) == 0 {
 							querySql += " " + searchKey + " in (?) "
 						} else {
 							querySql += " AND " + searchKey + " in (?) "
 						}
-						queryArgs = append(queryArgs, values)
+						queryArgs = append(queryArgs, stringSlice)
 					}
 				}
 			case []interface{}:
 				if len(vv) > 0 {
-					var stringSlice []string
+					var stringSlice []interface{}
 					for _, u := range vv {
-						stringSlice = append(stringSlice, u.(string))
+						stringSlice = append(stringSlice, u)
 					}
-					values := strings.Join(stringSlice, ",")
-					if len(values) > 0 {
+					if len(stringSlice) > 0 {
 						if len(querySql) == 0 {
 							querySql += " " + searchKey + " in (?) "
 						} else {
 							querySql += " AND " + searchKey + " in (?) "
 						}
-						queryArgs = append(queryArgs, values)
+						queryArgs = append(queryArgs, stringSlice)
 					}
 				}
 			case nil:

@@ -26,7 +26,7 @@ func TestGetById(t *testing.T) {
 
 func TestFindUserPage(t *testing.T) {
 	PreInit()
-	page := service.FindUserByPage([]int{1, 2}, "", "", "", 1, 10)
+	page := service.FindUserByPage([]int{1, 2}, "a", "", "", 1, 10)
 
 	data, err := json.Marshal(page)
 	if err != nil {
