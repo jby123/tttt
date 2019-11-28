@@ -11,4 +11,5 @@ type SysLog struct {
 	Operator  string    `gorm:"column:operator" json:"name"`
 	OptUrl    string    `gorm:"column:opt_url" json:"action"`
 	Params    string    `gorm:"column:password" json:"password"`
+	CostTime  int64     `gorm:"column:cost_time" json:"costTime"`
 }
