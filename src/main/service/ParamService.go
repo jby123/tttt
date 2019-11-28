@@ -64,5 +64,5 @@ func UpdateParam(param *model.SysParam) error {
 
 func DeleteParamById(id uint) {
 	param := new(model.SysParam)
-	_ := database.DeleteById(id, param)
+	database.DeleteById(id, param)
 }
