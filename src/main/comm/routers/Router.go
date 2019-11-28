@@ -98,4 +98,14 @@ func RegisterRoute(application *gin.Engine) {
 		department.POST("/update", controller.UpdateParam())
 		department.POST("/delete", controller.DeleteParam())
 	}
+
+	//數據字典 api
+	{
+		department := sys.Group("/dic")
+		department.GET("/page", controller.PageDic())
+		department.GET("/info", controller.GetDic())
+		department.POST("/add", controller.CreateDic())
+		department.POST("/update", controller.UpdateDic())
+		department.POST("/delete", controller.DeleteDic())
+	}
 }

@@ -8,30 +8,30 @@ import (
 )
 
 /**
- * 分页获取-參數-列表
- * @method FindParamByPage
+ * 分页获取-字典-列表
+ * @method FindDicByPage
  * @param  {[type]} order string [description]
  * @param  {[type]} sort string [description]
  * @param  {[type]} pageNum int    [description]
  * @param  {[type]} pageSize int    [description]
  */
-func FindParamByPage(name, order, sort string, pageNum, pageSize int) (page *utils.PaginationVo) {
+func FindDicByPage(name, order, sort string, pageNum, pageSize int) (page *utils.PaginationVo) {
 	searchMap := make(map[string]interface{})
 	searchMap["name"] = name
-	var resultDataList []*model.SysParam
+	var resultDataList []*model.SysDic
 	if err := database.FindPage(searchMap, sort, sort, pageNum, pageSize).Find(&resultDataList).Error; err != nil {
-		fmt.Printf("FindParamByPage.Error:%s\n", err)
+		fmt.Printf("FindDicByPage.Error:%s\n", err)
 		return utils.Pagination(resultDataList, pageNum, pageSize, 0)
 	}
-	total := database.Count(searchMap, &model.SysParam{})
+	total := database.Count(searchMap, &model.SysDic{})
 	return utils.Pagination(resultDataList, pageNum, pageSize, total)
 }
 
-func GetParamById(id uint) (resultData *model.SysParam) {
-	resultData = new(model.SysParam)
+func GetDicById(id uint) (resultData *model.SysDic) {
+	resultData = new(model.SysDic)
 	err := database.GetById(id, resultData)
 	if err != nil {
-		fmt.Printf("GetParamById.error.%s\n", err)
+		fmt.Printf("GetDicById.error.%s\n", err)
 	}
 	return resultData
 }
@@ -39,10 +39,10 @@ func GetParamById(id uint) (resultData *model.SysParam) {
 /**
  * 创建
  * @method CreateParam
- * @param  {[type]} param model.SysParam    [description]
+ * @param  {[type]} dic model.SysDic    [description]
  */
-func CreateParam(param *model.SysParam) error {
-	err := database.Create(param)
+func CreateDic(dic *model.SysDic) error {
+	err := database.Create(dic)
 	if err != nil {
 		return err
 	}
@@ -51,18 +51,18 @@ func CreateParam(param *model.SysParam) error {
 
 /**
  * 更新
- * @method UpdateParam
- * @param  {[type]} param model.SysParam    [description]
+ * @method UpdateDic
+ * @param  {[type]} dic model.SysDic    [description]
  */
-func UpdateParam(param *model.SysParam) error {
-	err := database.Update(param)
+func UpdateDic(dic *model.SysDic) error {
+	err := database.Update(dic)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func DeleteParamById(id uint) {
-	param := new(model.SysParam)
+func DeleteDicById(id uint) {
+	param := new(model.SysDic)
 	database.DeleteById(id, param)
 }
