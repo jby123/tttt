@@ -2,7 +2,7 @@
 <div class="htmleaf-container">
   <div class="wrapper">
     <div class="container">
-      <h1>17car管理平台</h1>
+      <h1>管理平台</h1>
 
       <form id="loginForm" style="width: 602px" data-parsley-validate="" novalidate=""
             role="form"
