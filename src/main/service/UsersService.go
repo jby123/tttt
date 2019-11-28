@@ -147,9 +147,8 @@ func UpdateUser(sysUser *model.SysUser) error {
 	hash, _ := bcrypt.Hash(sysUser.Password, salt)
 	sysUser.Password = hash
 
-	err := database.Update(sysUser)
+	err := database.UpdateById(sysUser.ID, sysUser)
 	if err != nil {
-		panic(err)
 		return err
 	}
 	return nil

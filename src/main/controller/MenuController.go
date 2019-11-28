@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"goAdmin/src/main/controller/vo/req"
+	"goAdmin/src/main/model"
 	"goAdmin/src/main/service"
 	"goAdmin/src/main/utils"
 	"net/http"
@@ -50,15 +51,29 @@ func GetMenu() gin.HandlerFunc {
 
 func CreateMenu() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		ctx.Status(http.StatusOK)
-		ctx.JSON(http.StatusOK, nil)
+		var sysMenu model.SysMenu
+		error := ctx.BindJSON(&sysMenu)
+		if error != nil {
+			fmt.Printf("UpdateMenu.bind.error.%s \n", error)
+			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
+			return
+		}
+		service.CreateMenu(&sysMenu)
+		ctx.JSON(http.StatusOK, utils.Success(nil))
 	}
 }
 
 func UpdateMenu() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		ctx.Status(http.StatusOK)
-		ctx.JSON(http.StatusOK, nil)
+		var sysMenu model.SysMenu
+		error := ctx.BindJSON(&sysMenu)
+		if error != nil {
+			fmt.Printf("UpdateMenu.bind.error.%s \n", error)
+			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
+			return
+		}
+		service.UpdateMenu(&sysMenu)
+		ctx.JSON(http.StatusOK, utils.Success(nil))
 	}
 }
 

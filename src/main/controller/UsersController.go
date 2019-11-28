@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"goAdmin/src/main/controller/vo/req"
+	"goAdmin/src/main/model"
 	"goAdmin/src/main/service"
 	"goAdmin/src/main/utils"
 	"net/http"
@@ -94,8 +95,15 @@ func GetUser() gin.HandlerFunc {
  */
 func CreateUser() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		ctx.Status(http.StatusOK)
-		ctx.JSON(http.StatusOK, nil)
+		var sysUser model.SysUser
+		error := ctx.BindJSON(&sysUser)
+		if error != nil {
+			fmt.Printf("CreateUser.bind.error.%s \n", error)
+			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
+			return
+		}
+		service.CreateUser(&sysUser)
+		ctx.JSON(http.StatusOK, utils.Success(nil))
 	}
 }
 
@@ -113,8 +121,15 @@ func CreateUser() gin.HandlerFunc {
  */
 func UpdateUser() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		ctx.Status(http.StatusOK)
-		ctx.JSON(http.StatusOK, nil)
+		var sysUser model.SysUser
+		error := ctx.BindJSON(&sysUser)
+		if error != nil {
+			fmt.Printf("CreateUser.bind.error.%s \n", error)
+			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
+			return
+		}
+		service.UpdateUser(&sysUser)
+		ctx.JSON(http.StatusOK, utils.Success(nil))
 	}
 }
 

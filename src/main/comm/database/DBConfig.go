@@ -185,6 +185,14 @@ func Update(model interface{}) error {
 	return nil
 }
 
+func UpdateById(id uint, model interface{}) error {
+	if err := dbClient.Where("id = ?", id).Update(model).Error; err != nil {
+		fmt.Printf("Update.Err:%s\n", err)
+		return err
+	}
+	return nil
+}
+
 func ParseSearchMap(searchMap map[string]interface{}) (string, []interface{}) {
 	var querySql string
 	var index int = 0

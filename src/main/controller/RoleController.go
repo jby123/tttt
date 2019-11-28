@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"goAdmin/src/main/controller/vo/req"
+	"goAdmin/src/main/model"
 	"goAdmin/src/main/service"
 	"goAdmin/src/main/utils"
 	"net/http"
@@ -51,15 +52,29 @@ func GetRole() gin.HandlerFunc {
 
 func CreateRole() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		ctx.Status(http.StatusOK)
-		ctx.JSON(http.StatusOK, nil)
+		var sysRole model.SysRole
+		error := ctx.BindJSON(&sysRole)
+		if error != nil {
+			fmt.Printf("CreateRole.bind.error.%s \n", error)
+			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
+			return
+		}
+		service.CreateRole(&sysRole)
+		ctx.JSON(http.StatusOK, utils.Success(nil))
 	}
 }
 
 func UpdateRole() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		ctx.Status(http.StatusOK)
-		ctx.JSON(http.StatusOK, nil)
+		var sysRole model.SysRole
+		error := ctx.BindJSON(&sysRole)
+		if error != nil {
+			fmt.Printf("CreateRole.bind.error.%s \n", error)
+			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
+			return
+		}
+		service.UpdateRole(&sysRole)
+		ctx.JSON(http.StatusOK, utils.Success(nil))
 	}
 }
 
