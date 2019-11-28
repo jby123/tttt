@@ -237,48 +237,30 @@ func ParseSearchMap(searchMap map[string]interface{}) (string, []interface{}) {
 				queryArgs = append(queryArgs, searchValue)
 			case []uint:
 				if len(vv) > 0 {
-					var stringSlice []uint
-					for _, u := range vv {
-						stringSlice = append(stringSlice, u)
+					if len(querySql) == 0 {
+						querySql += " " + searchKey + " in (?) "
+					} else {
+						querySql += " AND " + searchKey + " in (?) "
 					}
-					if len(stringSlice) > 0 {
-						if len(querySql) == 0 {
-							querySql += " " + searchKey + " in (?) "
-						} else {
-							querySql += " AND " + searchKey + " in (?) "
-						}
-						queryArgs = append(queryArgs, stringSlice)
-					}
+					queryArgs = append(queryArgs, vv)
 				}
 			case []int:
 				if len(vv) > 0 {
-					var stringSlice []int
-					for _, u := range vv {
-						stringSlice = append(stringSlice, u)
+					if len(querySql) == 0 {
+						querySql += " " + searchKey + " in (?) "
+					} else {
+						querySql += " AND " + searchKey + " in (?) "
 					}
-					if len(stringSlice) > 0 {
-						if len(querySql) == 0 {
-							querySql += " " + searchKey + " in (?) "
-						} else {
-							querySql += " AND " + searchKey + " in (?) "
-						}
-						queryArgs = append(queryArgs, stringSlice)
-					}
+					queryArgs = append(queryArgs, vv)
 				}
 			case []interface{}:
 				if len(vv) > 0 {
-					var stringSlice []interface{}
-					for _, u := range vv {
-						stringSlice = append(stringSlice, u)
+					if len(querySql) == 0 {
+						querySql += " " + searchKey + " in (?) "
+					} else {
+						querySql += " AND " + searchKey + " in (?) "
 					}
-					if len(stringSlice) > 0 {
-						if len(querySql) == 0 {
-							querySql += " " + searchKey + " in (?) "
-						} else {
-							querySql += " AND " + searchKey + " in (?) "
-						}
-						queryArgs = append(queryArgs, stringSlice)
-					}
+					queryArgs = append(queryArgs, vv)
 				}
 			case nil:
 				if len(querySql) == 0 {

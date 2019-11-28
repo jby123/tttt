@@ -52,7 +52,6 @@ func RegisterRoute(application *gin.Engine) {
 	//用户api
 	{
 		user := sys.Group("/user")
-		user.Use(middleware.AuthorizationHandler(""))
 		user.GET("/page", middleware.AuthorizationHandler(utils.PermsUserPage), controller.PageUsers())
 		user.GET("/list", middleware.AuthorizationHandler(utils.PermsUserList), controller.ListUsers())
 		user.GET("/info", middleware.AuthorizationHandler(utils.PermsUserInfo), controller.GetUser())
@@ -63,7 +62,6 @@ func RegisterRoute(application *gin.Engine) {
 	//角色 api
 	{
 		role := sys.Group("/role")
-		role.Use(middleware.AuthorizationHandler(""))
 		role.GET("/page", middleware.AuthorizationHandler(utils.PermsRolePage), controller.PageRoles())
 		role.GET("/list", middleware.AuthorizationHandler(utils.PermsRoleList), controller.ListRoles())
 		role.GET("/info", middleware.AuthorizationHandler(utils.PermsRoleInfo), controller.GetRole())
@@ -74,7 +72,6 @@ func RegisterRoute(application *gin.Engine) {
 	//菜单 api
 	{
 		menu := sys.Group("/menu")
-		menu.Use(middleware.AuthorizationHandler(""))
 		menu.GET("/page", middleware.AuthorizationHandler(utils.PermsMenuPage), controller.PageMenus())
 		menu.GET("/list", middleware.AuthorizationHandler(utils.PermsMenuList), controller.ListMenus())
 		menu.GET("/info", middleware.AuthorizationHandler(utils.PermsMenuInfo), controller.GetMenu())
@@ -85,7 +82,6 @@ func RegisterRoute(application *gin.Engine) {
 	//部门 api
 	{
 		department := sys.Group("/department")
-		department.Use(middleware.AuthorizationHandler(""))
 		department.GET("/page", middleware.AuthorizationHandler(utils.PermsDepartmentPage), controller.PageDepartments())
 		department.GET("/list", middleware.AuthorizationHandler(utils.PermsDepartmentList), controller.ListDepartments())
 		department.GET("/info", middleware.AuthorizationHandler(utils.PermsDepartmentInfo), controller.GetDepartment())
@@ -93,5 +89,13 @@ func RegisterRoute(application *gin.Engine) {
 		department.POST("/update", middleware.AuthorizationHandler(utils.PermsDepartmentUpdate), controller.UpdateDepartment())
 		department.POST("/delete", middleware.AuthorizationHandler(utils.PermsDepartmentDelete), controller.DeleteDepartment())
 	}
-
+	//系統參數 api
+	{
+		department := sys.Group("/param")
+		department.GET("/page", controller.PageParams())
+		department.GET("/info", controller.GetParam())
+		department.POST("/add", controller.CreateParam())
+		department.POST("/update", controller.UpdateParam())
+		department.POST("/delete", controller.DeleteParam())
+	}
 }
