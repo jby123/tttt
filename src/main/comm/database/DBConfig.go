@@ -103,34 +103,34 @@ type SearchMap map[string]interface{}
  * @param  {[type]} limit int    [description]
 */
 func FindPage(searchMap map[string]interface{}, order, sort string, offset, limit int) *gorm.DB {
-
+	client := GetDB()
+	searchSql, searchArgs := ParseSearchMap(searchMap)
+	if len(searchSql) > 0 {
+		client = client.Where(searchSql, searchArgs)
+	}
 	if len(sort) <= 0 {
 		sort = "desc"
 	}
 	if len(order) <= 0 {
 		order = "create_time"
 	}
-	dbClient.Order(" " + order + " " + sort + " ")
-
-	searchSql, searchArgs := ParseSearchMap(searchMap)
-	if len(searchSql) > 0 {
-		dbClient.Where(searchSql, searchArgs)
-	}
+	client = client.Order(" " + order + " " + sort + " ")
 	if offset > 0 {
-		dbClient.Offset((offset - 1) * limit)
+		client = client.Offset((offset - 1) * limit)
 	}
 	if limit > 0 {
-		dbClient.Limit(limit)
+		client = client.Limit(limit)
 	}
-	return dbClient
+	return client
 }
 
 func FindListByParam(searchMap map[string]interface{}, resultDataList interface{}) error {
 	searchSql, searchArgs := ParseSearchMap(searchMap)
+	client := GetDB()
 	if len(searchSql) > 0 {
-		dbClient.Where(searchSql, searchArgs)
+		client = client.Where(searchSql, searchArgs)
 	}
-	if err := dbClient.Find(resultDataList).Error; err != nil {
+	if err := client.Find(resultDataList).Error; err != nil {
 		fmt.Printf("FindListByParam.Err:%s\n", err)
 		return err
 	}
@@ -138,13 +138,14 @@ func FindListByParam(searchMap map[string]interface{}, resultDataList interface{
 }
 
 func Count(searchMap map[string]interface{}, model interface{}) int {
-	dbClient.Model(model)
+	client := GetDB()
+	client = client.Model(model)
 	searchSql, searchArgs := ParseSearchMap(searchMap)
 	if len(searchSql) > 0 {
-		dbClient.Where(searchSql, searchArgs)
+		client = client.Where(searchSql, searchArgs)
 	}
 	var total int = 0
-	dbClient.Count(&total)
+	client.Count(&total)
 	return total
 }
 
@@ -154,7 +155,8 @@ func Count(searchMap map[string]interface{}, model interface{}) int {
  * @param  {[type]} model interface{} [description]
  */
 func GetById(id uint, model interface{}) error {
-	if err := dbClient.Where("id = ?", id).First(model).Error; err != nil {
+	client := GetDB()
+	if err := client.Where("id = ?", id).First(model).Error; err != nil {
 		fmt.Printf("GetById.Err:%s\n", err)
 		return err
 	}
@@ -162,7 +164,8 @@ func GetById(id uint, model interface{}) error {
 }
 
 func DeleteById(id uint, model interface{}) error {
-	if err := dbClient.Where("id = ?", id).Delete(model).Error; err != nil {
+	client := GetDB()
+	if err := client.Where("id = ?", id).Delete(model).Error; err != nil {
 		fmt.Printf("DeleteById.Err:%s\n", err)
 		return err
 	}
@@ -170,7 +173,8 @@ func DeleteById(id uint, model interface{}) error {
 }
 
 func Create(model interface{}) error {
-	if err := dbClient.Create(model).Error; err != nil {
+	client := GetDB()
+	if err := client.Create(model).Error; err != nil {
 		fmt.Printf("Create.Err:%s\n", err)
 		return err
 	}
@@ -178,7 +182,8 @@ func Create(model interface{}) error {
 }
 
 func Update(model interface{}) error {
-	if err := dbClient.Update(model).Error; err != nil {
+	client := GetDB()
+	if err := client.Update(model).Error; err != nil {
 		fmt.Printf("Update.Err:%s\n", err)
 		return err
 	}
@@ -186,7 +191,8 @@ func Update(model interface{}) error {
 }
 
 func UpdateById(id uint, model interface{}) error {
-	if err := dbClient.Where("id = ?", id).Update(model).Error; err != nil {
+	client := GetDB()
+	if err := client.Where("id = ?", id).Update(model).Error; err != nil {
 		fmt.Printf("Update.Err:%s\n", err)
 		return err
 	}

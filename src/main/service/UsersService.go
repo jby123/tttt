@@ -6,6 +6,7 @@ import (
 	"goAdmin/src/main/comm/database"
 	"goAdmin/src/main/model"
 	"goAdmin/src/main/utils"
+	"strconv"
 	"strings"
 )
 
@@ -57,11 +58,13 @@ func FindUserByPage(departmentIds []int, name, order, sort string, pageNum, page
 		sql = strings.Replace(sql, "{departmentIds}", values, -1)
 	}
 	offset := (pageNum - 1) * pageSize
-	limit := "limit " + string(offset) + ", " + string(pageSize) + ""
+	limit := "limit " + strconv.Itoa(offset) + ", " + strconv.Itoa(pageSize) + ""
 	sql = strings.Replace(sql, "{filterLimit}", limit, -1)
+
+	fmt.Printf("findUserPage....sql:%s", sql)
 	err := database.GetDB().Raw(sql).Scan(&resultDataList).Error
 	if err != nil {
-		fmt.Printf("FindByPage.Error:%s", err)
+		fmt.Printf("FindByPage.Error:%s\n", err)
 		return utils.Pagination(resultDataList, pageNum, pageSize, 0)
 	}
 	return utils.Pagination(resultDataList, pageNum, pageSize, total)
