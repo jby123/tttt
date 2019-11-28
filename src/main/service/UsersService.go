@@ -61,7 +61,7 @@ func FindUserByPage(departmentIds []int, name, order, sort string, pageNum, page
 	limit := "limit " + strconv.Itoa(offset) + ", " + strconv.Itoa(pageSize) + ""
 	sql = strings.Replace(sql, "{filterLimit}", limit, -1)
 
-	fmt.Printf("findUserPage....sql:%s", sql)
+	fmt.Printf("findUserPage....sql:%s\n", sql)
 	err := database.GetDB().Raw(sql).Scan(&resultDataList).Error
 	if err != nil {
 		fmt.Printf("FindByPage.Error:%s\n", err)
