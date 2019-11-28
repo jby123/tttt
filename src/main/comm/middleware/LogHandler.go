@@ -71,7 +71,7 @@ func LogHandler() gin.HandlerFunc {
 		accessLogJson, _ := utils.Encode(accessLogMap)
 		accessChannel <- accessLogJson
 
-		fmt.Printf("\n<<<<<<after request ....<<<<LogHandler.end.\n...json: %s>>>>>", accessLogJson)
+		fmt.Printf("\n<<<<<<after request ....<<<<LogHandler.end.\n...json: %s>>>>>\n", accessLogJson)
 	}
 }
 
