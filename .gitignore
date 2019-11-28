@@ -1,2 +1,17 @@
 /.idea
+/log/
 /logs/
+/View/.vscode
+/View/node_modules/
+/View/dist/
+/dist/
+/*.js
+/test/unit/coverage/
+/src/iconfont/iconfont.js
+
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
