@@ -6,6 +6,7 @@ import (
 	"goAdmin/src/main/comm/database"
 	"goAdmin/src/main/model"
 	"goAdmin/src/main/utils"
+	"strings"
 )
 
 /**
@@ -19,19 +20,50 @@ import (
  * @param  {[type]} pageSize int    [description]
  */
 func FindUserByPage(departmentIds []int, name, order, sort string, pageNum, pageSize int) (page *utils.PaginationVo) {
+
+	var resultDataList []*model.SysUserVo
+
+	//1.統計
 	searchMap := make(map[string]interface{})
 	searchMap["username"] = name
-	if len(departmentIds) > 0 {
-		searchMap["department_id"] = departmentIds
+	searchMap["department_id"] = departmentIds
+	total := database.Count(searchMap, &model.SysUser{})
+	if total == 0 {
+		return utils.Pagination(resultDataList, pageNum, pageSize, 0)
 	}
-	var resultDataList []*model.SysUser
-
-	err := database.FindPage(searchMap, order, sort, pageNum, pageSize).Model(&model.SysUser{}).Joins("LEFT JOIN sys_user_role  ON sys_user.id = sys_user_role.user_id").Joins("LEFT JOIN sys_role  ON sys_user_role.role_id = sys_role.id").Joins("LEFT JOIN sys_department  ON sys_department.id = sys_user.department_id").Group("sys_user.id").Select("sys_user.*,GROUP_CONCAT(sys_role.name) AS role_name,sys_department.name as department_name").Find(&resultDataList).Error
+	var sql string = ` SELECT u.*, GROUP_CONCAT(r.name) AS roleName, d.name AS departmentName `
+	sql += ` FROM sys_user AS u `
+	sql += ` LEFT JOIN sys_user_role AS ur ON u.id = ur.user_id `
+	sql += ` LEFT JOIN sys_role AS r ON ur.role_id = r.id `
+	sql += ` LEFT JOIN sys_department AS d  ON d.id = u.department_id `
+	sql += ` WHERE 1=1 `
+	if len(name) > 0 {
+		sql += ` AND username like {userName} `
+	}
+	if len(departmentIds) > 0 {
+		sql += ` AND department_id IN ({departmentIds}) `
+	}
+	sql += ` GROUP BY u.id  `
+	sql += ` {filterLimit} `
+	if len(name) > 0 {
+		sql = strings.Replace(sql, "{userName}", name, -1)
+	}
+	if len(departmentIds) > 0 {
+		var stringSlice []string
+		for _, departmentId := range departmentIds {
+			stringSlice = append(stringSlice, string(departmentId))
+		}
+		values := strings.Join(stringSlice, ",")
+		sql = strings.Replace(sql, "{departmentIds}", values, -1)
+	}
+	offset := (pageNum - 1) * pageSize
+	limit := "limit " + string(offset) + ", " + string(pageSize) + ""
+	sql = strings.Replace(sql, "{filterLimit}", limit, -1)
+	err := database.GetDB().Raw(sql).Scan(&resultDataList).Error
 	if err != nil {
 		fmt.Printf("FindByPage.Error:%s", err)
 		return utils.Pagination(resultDataList, pageNum, pageSize, 0)
 	}
-	total := database.Count(searchMap, &model.SysUser{})
 	return utils.Pagination(resultDataList, pageNum, pageSize, total)
 }
 

@@ -89,6 +89,10 @@ func GetDB() *gorm.DB {
 	return DBClient
 }
 
+func closeDB() {
+	DBClient.Close()
+}
+
 type SearchMap map[string]interface{}
 
 /**
@@ -228,7 +232,7 @@ func ParseSearchMap(searchMap map[string]interface{}) (string, []interface{}) {
 					for _, u := range vv {
 						stringSlice = append(stringSlice, u.(string))
 					}
-					values := strings.Join(stringSlice, "_")
+					values := strings.Join(stringSlice, ",")
 					if len(values) > 0 {
 						if len(querySql) == 0 {
 							querySql += " " + searchKey + " in (?) "

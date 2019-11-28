@@ -17,9 +17,6 @@ type SysUser struct {
 	DepartmentId uint      `gorm:"column:department_id" json:"departmentId"`
 	Status       uint      `gorm:"column:status" json:"status"`
 	Remark       string    `gorm:"column:remark" json:"remark"`
-
-	RoleName       string `gorm:"column:role_name" json:"roleName"`
-	DepartmentName string `gorm:"column:department_name" json:"departmentName"`
 }
 
 type SysUserVo struct {
