@@ -15,7 +15,6 @@ func ExceptionHandler() gin.HandlerFunc {
 			if err := recover(); err != nil {
 				//能知道 err 所屬 code ,msg
 				context.JSON(utils.SYSTEM_ERROR_CODE, utils.Error(utils.SYSTEM_ERROR_CODE, err.(string), nil))
-				context.Error(err.(error))
 				context.Abort()
 			}
 		}()
