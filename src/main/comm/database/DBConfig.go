@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-var DBClient *gorm.DB
+var dbClient *gorm.DB
 
 const DefaultDevelopmentEnv = "dev"
 
@@ -31,21 +31,21 @@ type MysqlConf struct {
 
 // 初始化 DB 连接
 func InitDB(activeEnv string, dbConfig *DbConfig) (err error) {
-	DBClient, err = gorm.Open(dbConfig.Db.Dialect, dbConfig.Db.Url)
+	dbClient, err = gorm.Open(dbConfig.Db.Dialect, dbConfig.Db.Url)
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(-1)
 	}
 	if len(activeEnv) != 0 && activeEnv == DefaultDevelopmentEnv {
-		DBClient.LogMode(true)
+		dbClient.LogMode(true)
 	}
-	DBClient.DB().SetMaxIdleConns(dbConfig.Db.MaxIdle)
-	DBClient.DB().SetMaxOpenConns(dbConfig.Db.MaxOpen)
-	DBClient.DB().SetConnMaxLifetime(time.Duration(30) * time.Minute)
+	dbClient.DB().SetMaxIdleConns(dbConfig.Db.MaxIdle)
+	dbClient.DB().SetMaxOpenConns(dbConfig.Db.MaxOpen)
+	dbClient.DB().SetConnMaxLifetime(time.Duration(30) * time.Minute) //心跳時間設置為MySQL的一半
 	//注册 db回调钩子操作
-	DBClient.Callback().Create().Replace("gorm:create_time", updateTimeStampForCreateCallback)
-	DBClient.Callback().Update().Replace("gorm:update_time", updateTimeStampForUpdateCallback)
-	err = DBClient.DB().Ping()
+	dbClient.Callback().Create().Replace("gorm:create_time", updateTimeStampForCreateCallback)
+	dbClient.Callback().Update().Replace("gorm:update_time", updateTimeStampForUpdateCallback)
+	err = dbClient.DB().Ping()
 	/**
 	 *禁用表名复数>
 	 *!!!如不禁用则会出现表 y结尾边ies的问题
@@ -55,7 +55,7 @@ func InitDB(activeEnv string, dbConfig *DbConfig) (err error) {
 	 *   return "数据库表名"
 	 *}
 	 */
-	DBClient.SingularTable(true)
+	dbClient.SingularTable(true)
 	return
 }
 
@@ -86,11 +86,7 @@ func updateTimeStampForUpdateCallback(scope *gorm.Scope) {
 
 // 获取mysql连接
 func GetDB() *gorm.DB {
-	return DBClient
-}
-
-func closeDB() {
-	DBClient.Close()
+	return dbClient
 }
 
 type SearchMap map[string]interface{}
@@ -114,27 +110,27 @@ func FindPage(searchMap map[string]interface{}, order, sort string, offset, limi
 	if len(order) <= 0 {
 		order = "create_time"
 	}
-	DBClient = DBClient.Order(" " + order + " " + sort + " ")
+	dbClient.Order(" " + order + " " + sort + " ")
 
 	searchSql, searchArgs := ParseSearchMap(searchMap)
 	if len(searchSql) > 0 {
-		DBClient = DBClient.Where(searchSql, searchArgs)
+		dbClient.Where(searchSql, searchArgs)
 	}
 	if offset > 0 {
-		DBClient = DBClient.Offset((offset - 1) * limit)
+		dbClient.Offset((offset - 1) * limit)
 	}
 	if limit > 0 {
-		DBClient = DBClient.Limit(limit)
+		dbClient.Limit(limit)
 	}
-	return DBClient
+	return dbClient
 }
 
 func FindListByParam(searchMap map[string]interface{}, resultDataList interface{}) error {
 	searchSql, searchArgs := ParseSearchMap(searchMap)
 	if len(searchSql) > 0 {
-		DBClient = DBClient.Where(searchSql, searchArgs)
+		dbClient.Where(searchSql, searchArgs)
 	}
-	if err := DBClient.Find(resultDataList).Error; err != nil {
+	if err := dbClient.Find(resultDataList).Error; err != nil {
 		fmt.Printf("FindListByParam.Err:%s\n", err)
 		return err
 	}
@@ -142,13 +138,13 @@ func FindListByParam(searchMap map[string]interface{}, resultDataList interface{
 }
 
 func Count(searchMap map[string]interface{}, model interface{}) int {
-	DBClient = DBClient.Model(model)
+	dbClient.Model(model)
 	searchSql, searchArgs := ParseSearchMap(searchMap)
 	if len(searchSql) > 0 {
-		DBClient = DBClient.Where(searchSql, searchArgs)
+		dbClient.Where(searchSql, searchArgs)
 	}
 	var total int = 0
-	DBClient.Count(&total)
+	dbClient.Count(&total)
 	return total
 }
 
@@ -158,7 +154,7 @@ func Count(searchMap map[string]interface{}, model interface{}) int {
  * @param  {[type]} model interface{} [description]
  */
 func GetById(id uint, model interface{}) error {
-	if err := DBClient.Where("id = ?", id).First(model).Error; err != nil {
+	if err := dbClient.Where("id = ?", id).First(model).Error; err != nil {
 		fmt.Printf("GetById.Err:%s\n", err)
 		return err
 	}
@@ -166,7 +162,7 @@ func GetById(id uint, model interface{}) error {
 }
 
 func DeleteById(id uint, model interface{}) error {
-	if err := DBClient.Where("id = ?", id).Delete(model).Error; err != nil {
+	if err := dbClient.Where("id = ?", id).Delete(model).Error; err != nil {
 		fmt.Printf("DeleteById.Err:%s\n", err)
 		return err
 	}
@@ -174,7 +170,7 @@ func DeleteById(id uint, model interface{}) error {
 }
 
 func Create(model interface{}) error {
-	if err := DBClient.Create(model).Error; err != nil {
+	if err := dbClient.Create(model).Error; err != nil {
 		fmt.Printf("Create.Err:%s\n", err)
 		return err
 	}
@@ -182,7 +178,7 @@ func Create(model interface{}) error {
 }
 
 func Update(model interface{}) error {
-	if err := DBClient.Update(model).Error; err != nil {
+	if err := dbClient.Update(model).Error; err != nil {
 		fmt.Printf("Update.Err:%s\n", err)
 		return err
 	}
@@ -264,7 +260,7 @@ func ParseSearchMap(searchMap map[string]interface{}) (string, []interface{}) {
 // 关闭DB
 func CloseDB() {
 	fmt.Println("<<<<<<<<<<<<<DB.close.....>>>>>>")
-	if DBClient != nil {
-		DBClient.Close()
+	if dbClient != nil {
+		dbClient.Close()
 	}
 }

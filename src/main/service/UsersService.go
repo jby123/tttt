@@ -149,6 +149,7 @@ func UpdateUser(sysUser *model.SysUser) error {
 
 	err := database.Update(sysUser)
 	if err != nil {
+		panic(err)
 		return err
 	}
 	return nil
