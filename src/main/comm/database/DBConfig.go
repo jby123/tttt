@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"strconv"
 
 	"os"
 	"strings"
@@ -202,7 +203,7 @@ func UpdateById(id uint, model interface{}) error {
 func ParseSearchMap(searchMap map[string]interface{}) (string, []interface{}) {
 	var querySql string
 	var index int = 0
-	queryArgs := make([]interface{}, len(searchMap))
+	queryArgs := make([]interface{}, 0)
 	for searchKey, searchValue := range searchMap {
 		if len(searchKey) > 0 {
 			switch vv := searchValue.(type) {
@@ -213,7 +214,7 @@ func ParseSearchMap(searchMap map[string]interface{}) (string, []interface{}) {
 					} else {
 						querySql += " AND " + searchKey + " LIKE  ? "
 					}
-					queryArgs[index] = searchValue
+					queryArgs = append(queryArgs, "'%"+searchValue.(string)+"%'")
 				}
 			case float64:
 				if len(querySql) == 0 {
@@ -221,21 +222,53 @@ func ParseSearchMap(searchMap map[string]interface{}) (string, []interface{}) {
 				} else {
 					querySql += " AND " + searchKey + " =  ? "
 				}
-				queryArgs[index] = searchValue
+				queryArgs = append(queryArgs, searchValue)
 			case int:
 				if len(querySql) == 0 {
 					querySql += " " + searchKey + " =  ? "
 				} else {
 					querySql += " AND " + searchKey + " =  ? "
 				}
-				queryArgs[index] = searchValue
+				queryArgs = append(queryArgs, searchValue)
 			case uint:
 				if len(querySql) == 0 {
 					querySql += " " + searchKey + " =  ? "
 				} else {
 					querySql += " AND " + searchKey + " =  ? "
 				}
-				queryArgs[index] = searchValue
+				queryArgs = append(queryArgs, searchValue)
+			case []uint:
+				if len(vv) > 0 {
+					var stringSlice []string
+					for _, u := range vv {
+						stringSlice = append(stringSlice, strconv.Itoa(int(u)))
+					}
+					values := strings.Join(stringSlice, ",")
+					if len(values) > 0 {
+						if len(querySql) == 0 {
+							querySql += " " + searchKey + " in (?) "
+						} else {
+							querySql += " AND " + searchKey + " in (?) "
+						}
+						queryArgs = append(queryArgs, values)
+					}
+				}
+			case []int:
+				if len(vv) > 0 {
+					var stringSlice []string
+					for _, u := range vv {
+						stringSlice = append(stringSlice, strconv.Itoa(u))
+					}
+					values := strings.Join(stringSlice, ",")
+					if len(values) > 0 {
+						if len(querySql) == 0 {
+							querySql += " " + searchKey + " in (?) "
+						} else {
+							querySql += " AND " + searchKey + " in (?) "
+						}
+						queryArgs = append(queryArgs, values)
+					}
+				}
 			case []interface{}:
 				if len(vv) > 0 {
 					var stringSlice []string
@@ -249,7 +282,7 @@ func ParseSearchMap(searchMap map[string]interface{}) (string, []interface{}) {
 						} else {
 							querySql += " AND " + searchKey + " in (?) "
 						}
-						queryArgs[index] = values
+						queryArgs = append(queryArgs, values)
 					}
 				}
 			case nil:

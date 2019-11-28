@@ -47,12 +47,12 @@ func FindUserByPage(departmentIds []int, name, order, sort string, pageNum, page
 	sql += ` GROUP BY u.id  `
 	sql += ` {filterLimit} `
 	if len(name) > 0 {
-		sql = strings.Replace(sql, "{userName}", name, -1)
+		sql = strings.Replace(sql, "{userName}", "%"+name+"%", -1)
 	}
 	if len(departmentIds) > 0 {
 		var stringSlice []string
 		for _, departmentId := range departmentIds {
-			stringSlice = append(stringSlice, string(departmentId))
+			stringSlice = append(stringSlice, strconv.Itoa(departmentId))
 		}
 		values := strings.Join(stringSlice, ",")
 		sql = strings.Replace(sql, "{departmentIds}", values, -1)
