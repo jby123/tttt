@@ -212,7 +212,7 @@ func ParseSearchMap(searchMap map[string]interface{}) (string, []interface{}) {
 					} else {
 						querySql += " AND " + searchKey + " LIKE  ? "
 					}
-					queryArgs = append(queryArgs, "'%"+searchValue.(string)+"%'")
+					queryArgs = append(queryArgs, "%"+searchValue.(string)+"%")
 				}
 			case float64:
 				if len(querySql) == 0 {

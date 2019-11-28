@@ -32,6 +32,7 @@ func FindUserByPage(departmentIds []int, name, order, sort string, pageNum, page
 	if total == 0 {
 		return utils.Pagination(resultDataList, pageNum, pageSize, 0)
 	}
+	queryArgs := make([]interface{}, 0)
 	var sql string = ` SELECT u.*, GROUP_CONCAT(r.name) AS role_name, d.name AS department_name `
 	sql += ` FROM sys_user AS u `
 	sql += ` LEFT JOIN sys_user_role AS ur ON u.id = ur.user_id `
@@ -39,29 +40,21 @@ func FindUserByPage(departmentIds []int, name, order, sort string, pageNum, page
 	sql += ` LEFT JOIN sys_department AS d  ON d.id = u.department_id `
 	sql += ` WHERE 1=1 `
 	if len(name) > 0 {
-		sql += ` AND username like {userName} `
+		sql += ` AND username like ? `
+		queryArgs = append(queryArgs, "%"+name+"%")
 	}
 	if len(departmentIds) > 0 {
-		sql += ` AND department_id IN ({departmentIds}) `
+		sql += ` AND department_id IN (?) `
+		queryArgs = append(queryArgs, departmentIds)
 	}
 	sql += ` GROUP BY u.id  `
 	sql += ` {filterLimit} `
-	if len(name) > 0 {
-		sql = strings.Replace(sql, "{userName}", "%"+name+"%", -1)
-	}
-	if len(departmentIds) > 0 {
-		var stringSlice []string
-		for _, departmentId := range departmentIds {
-			stringSlice = append(stringSlice, strconv.Itoa(departmentId))
-		}
-		values := strings.Join(stringSlice, ",")
-		sql = strings.Replace(sql, "{departmentIds}", values, -1)
-	}
+
 	offset := (pageNum - 1) * pageSize
 	limit := "limit " + strconv.Itoa(offset) + ", " + strconv.Itoa(pageSize) + ""
 	sql = strings.Replace(sql, "{filterLimit}", limit, -1)
 
-	err := database.GetDB().Raw(sql).Scan(&resultDataList).Error
+	err := database.GetDB().Raw(sql, queryArgs...).Scan(&resultDataList).Error
 	if err != nil {
 		fmt.Printf("FindByPage.Error:%s\n", err)
 		return utils.Pagination(resultDataList, pageNum, pageSize, 0)
