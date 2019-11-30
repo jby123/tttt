@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"goAdmin/src/main/controller/vo/req"
+	"goAdmin/src/main/model"
 	"goAdmin/src/main/service"
 	"goAdmin/src/main/utils"
 	"net/http"
@@ -51,15 +52,29 @@ func GetDepartment() gin.HandlerFunc {
 
 func CreateDepartment() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		ctx.Status(http.StatusOK)
-		ctx.JSON(http.StatusOK, nil)
+		var sysDept model.SysDepartment
+		error := ctx.BindJSON(&sysDept)
+		if error != nil {
+			fmt.Printf("CreateDepartment.bind.error.%s \n", error)
+			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
+			return
+		}
+		service.CreateDept(&sysDept)
+		ctx.JSON(http.StatusOK, utils.Success(nil))
 	}
 }
 
 func UpdateDepartment() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		ctx.Status(http.StatusOK)
-		ctx.JSON(http.StatusOK, nil)
+		var sysDept model.SysDepartment
+		error := ctx.BindJSON(&sysDept)
+		if error != nil {
+			fmt.Printf("UpdateDepartment.bind.error.%s \n", error)
+			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
+			return
+		}
+		service.UpdateDept(&sysDept)
+		ctx.JSON(http.StatusOK, utils.Success(nil))
 	}
 }
 

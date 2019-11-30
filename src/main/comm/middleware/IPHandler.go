@@ -13,6 +13,7 @@ import (
  */
 func IPWhiteHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		//TODO 後期優化 從緩存獲取
 		ipWhiteList := service.FindIpList(model.IpWhiteType)
 		flag := false
 		clientIp := ctx.ClientIP()
@@ -35,6 +36,7 @@ func IPWhiteHandler() gin.HandlerFunc {
  */
 func IPBlackHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		//TODO 後期優化 從緩存獲取
 		ipBlackList := service.FindIpList(model.IpBlackType)
 		flag := false
 		clientIp := ctx.ClientIP()
@@ -45,7 +47,6 @@ func IPBlackHandler() gin.HandlerFunc {
 			}
 		}
 		if flag {
-			ctx.String(401, "%s, 在黑名单中，拒绝访问 \n", clientIp)
 			ctx.JSON(http.StatusUnauthorized, utils.Error(401, clientIp+",在黑名单中，拒绝访问", nil))
 			ctx.Abort()
 			return

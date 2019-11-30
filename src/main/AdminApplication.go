@@ -28,9 +28,11 @@ func startAdminApplication() (app *gin.Engine) {
 	//如果模型表这里没有添加模型，单元测试会报错数据表不存在。
 	//因为单元测试结束，会删除数据表
 	database.GetDB().AutoMigrate(
-		&model.SysUser{},
+		&model.SysDic{},
+		&model.SysParam{},
 		&model.SysLog{},
 		&model.SysIp{},
+		&model.SysUser{},
 		&model.SysDepartment{},
 		&model.SysRole{},
 		&model.SysMenu{},

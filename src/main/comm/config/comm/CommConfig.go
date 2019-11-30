@@ -1,12 +1,13 @@
 package comm
 
 type Conf struct {
-	Notify     IsOpenNotify     `yaml:"Notify"`
-	LoginValid LoginValidConfig `yaml:"LoginValid"`
+	Notify IsOpenNotify `yaml:"Notify"`
+	Valid  ValidConfig  `yaml:"Valid"`
 }
 
-type LoginValidConfig struct {
-	IsValidCaptcha bool `yaml:"IsValidCaptcha"`
+type ValidConfig struct {
+	IsLoginValidCaptcha bool `yaml:"IsLoginValidCaptcha"`
+	IsOpenAuthorization bool `yaml:"IsOpenAuthorization"`
 }
 
 type IsOpenNotify struct {

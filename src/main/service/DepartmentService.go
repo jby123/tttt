@@ -45,6 +45,31 @@ func GetDeptById(id uint) (resultData *model.SysDepartment) {
 	return resultData
 }
 
+/**
+ * 创建
+ * @method CreateDept
+ * @param  {[type]} sysDept model.SysDepartment    [description]
+ */
+func CreateDept(sysDept *model.SysDepartment) error {
+	err := database.Create(sysDept)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+/**
+ * 更新
+ * @method UpdateDept
+ * @param  {[type]} sysDept model.SysDepartment    [description]
+ */
+func UpdateDept(sysDept *model.SysDepartment) error {
+	err := database.UpdateById(sysDept.ID, sysDept)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 func DeleteDeptById(id uint) {
 	u := new(model.SysDepartment)
 	err := database.DeleteById(id, u)

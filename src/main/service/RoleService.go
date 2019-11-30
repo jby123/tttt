@@ -44,6 +44,32 @@ func GetRoleById(id uint) (resultData *model.SysRole) {
 	return resultData
 }
 
+/**
+ * 创建
+ * @method CreateRole
+ * @param  {[type]} sysRole model.SysRole    [description]
+ */
+func CreateRole(sysRole *model.SysRole) error {
+	err := database.Create(sysRole)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+/**
+ * 更新
+ * @method UpdateRole
+ * @param  {[type]} sysRole model.SysRole    [description]
+ */
+func UpdateRole(sysRole *model.SysRole) error {
+	err := database.Update(sysRole)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func DeleteRoleById(id uint) {
 	u := new(model.SysRole)
 	err := database.DeleteById(id, u)

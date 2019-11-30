@@ -4,13 +4,11 @@ import (
 	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
-
 	"os"
-	"strings"
 	"time"
 )
 
-var DBClient *gorm.DB
+var dbClient *gorm.DB
 
 const DefaultDevelopmentEnv = "dev"
 
@@ -31,21 +29,21 @@ type MysqlConf struct {
 
 // 初始化 DB 连接
 func InitDB(activeEnv string, dbConfig *DbConfig) (err error) {
-	DBClient, err = gorm.Open(dbConfig.Db.Dialect, dbConfig.Db.Url)
+	dbClient, err = gorm.Open(dbConfig.Db.Dialect, dbConfig.Db.Url)
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(-1)
 	}
 	if len(activeEnv) != 0 && activeEnv == DefaultDevelopmentEnv {
-		DBClient.LogMode(true)
+		dbClient.LogMode(true)
 	}
-	DBClient.DB().SetMaxIdleConns(dbConfig.Db.MaxIdle)
-	DBClient.DB().SetMaxOpenConns(dbConfig.Db.MaxOpen)
-	DBClient.DB().SetConnMaxLifetime(time.Duration(30) * time.Minute)
+	dbClient.DB().SetMaxIdleConns(dbConfig.Db.MaxIdle)
+	dbClient.DB().SetMaxOpenConns(dbConfig.Db.MaxOpen)
+	dbClient.DB().SetConnMaxLifetime(time.Duration(30) * time.Minute) //心跳時間設置為MySQL的一半
 	//注册 db回调钩子操作
-	DBClient.Callback().Create().Replace("gorm:create_time", updateTimeStampForCreateCallback)
-	DBClient.Callback().Update().Replace("gorm:update_time", updateTimeStampForUpdateCallback)
-	err = DBClient.DB().Ping()
+	dbClient.Callback().Create().Replace("gorm:create_time", updateTimeStampForCreateCallback)
+	dbClient.Callback().Update().Replace("gorm:update_time", updateTimeStampForUpdateCallback)
+	err = dbClient.DB().Ping()
 	/**
 	 *禁用表名复数>
 	 *!!!如不禁用则会出现表 y结尾边ies的问题
@@ -55,7 +53,7 @@ func InitDB(activeEnv string, dbConfig *DbConfig) (err error) {
 	 *   return "数据库表名"
 	 *}
 	 */
-	DBClient.SingularTable(true)
+	dbClient.SingularTable(true)
 	return
 }
 
@@ -86,7 +84,7 @@ func updateTimeStampForUpdateCallback(scope *gorm.Scope) {
 
 // 获取mysql连接
 func GetDB() *gorm.DB {
-	return DBClient
+	return dbClient
 }
 
 type SearchMap map[string]interface{}
@@ -103,34 +101,34 @@ type SearchMap map[string]interface{}
  * @param  {[type]} limit int    [description]
 */
 func FindPage(searchMap map[string]interface{}, order, sort string, offset, limit int) *gorm.DB {
-
+	client := GetDB()
+	searchSql, searchArgs := ParseSearchMap(searchMap)
+	if len(searchSql) > 0 {
+		client = client.Where(searchSql, searchArgs...)
+	}
 	if len(sort) <= 0 {
 		sort = "desc"
 	}
 	if len(order) <= 0 {
 		order = "create_time"
 	}
-	DBClient = DBClient.Order(" " + order + " " + sort + " ")
-
-	searchSql, searchArgs := ParseSearchMap(searchMap)
-	if len(searchSql) > 0 {
-		DBClient = DBClient.Where(searchSql, searchArgs)
-	}
+	client = client.Order(" " + order + " " + sort + " ")
 	if offset > 0 {
-		DBClient = DBClient.Offset((offset - 1) * limit)
+		client = client.Offset((offset - 1) * limit)
 	}
 	if limit > 0 {
-		DBClient = DBClient.Limit(limit)
+		client = client.Limit(limit)
 	}
-	return DBClient
+	return client
 }
 
 func FindListByParam(searchMap map[string]interface{}, resultDataList interface{}) error {
 	searchSql, searchArgs := ParseSearchMap(searchMap)
+	client := GetDB()
 	if len(searchSql) > 0 {
-		DBClient = DBClient.Where(searchSql, searchArgs)
+		client = client.Where(searchSql, searchArgs)
 	}
-	if err := DBClient.Find(resultDataList).Error; err != nil {
+	if err := client.Find(resultDataList).Error; err != nil {
 		fmt.Printf("FindListByParam.Err:%s\n", err)
 		return err
 	}
@@ -138,13 +136,15 @@ func FindListByParam(searchMap map[string]interface{}, resultDataList interface{
 }
 
 func Count(searchMap map[string]interface{}, model interface{}) int {
-	DBClient = DBClient.Model(model)
+	client := GetDB()
+	client = client.Model(model)
 	searchSql, searchArgs := ParseSearchMap(searchMap)
 	if len(searchSql) > 0 {
-		DBClient = DBClient.Where(searchSql, searchArgs)
+		client = client.Where(searchSql, searchArgs...)
 	}
+
 	var total int = 0
-	DBClient.Count(&total)
+	client.Count(&total)
 	return total
 }
 
@@ -154,7 +154,8 @@ func Count(searchMap map[string]interface{}, model interface{}) int {
  * @param  {[type]} model interface{} [description]
  */
 func GetById(id uint, model interface{}) error {
-	if err := DBClient.Where("id = ?", id).First(model).Error; err != nil {
+	client := GetDB()
+	if err := client.Where("id = ?", id).First(model).Error; err != nil {
 		fmt.Printf("GetById.Err:%s\n", err)
 		return err
 	}
@@ -162,7 +163,8 @@ func GetById(id uint, model interface{}) error {
 }
 
 func DeleteById(id uint, model interface{}) error {
-	if err := DBClient.Where("id = ?", id).Delete(model).Error; err != nil {
+	client := GetDB()
+	if err := client.Where("id = ?", id).Delete(model).Error; err != nil {
 		fmt.Printf("DeleteById.Err:%s\n", err)
 		return err
 	}
@@ -170,7 +172,8 @@ func DeleteById(id uint, model interface{}) error {
 }
 
 func Create(model interface{}) error {
-	if err := DBClient.Create(model).Error; err != nil {
+	client := GetDB()
+	if err := client.Create(model).Error; err != nil {
 		fmt.Printf("Create.Err:%s\n", err)
 		return err
 	}
@@ -178,7 +181,17 @@ func Create(model interface{}) error {
 }
 
 func Update(model interface{}) error {
-	if err := DBClient.Update(model).Error; err != nil {
+	client := GetDB()
+	if err := client.Update(model).Error; err != nil {
+		fmt.Printf("Update.Err:%s\n", err)
+		return err
+	}
+	return nil
+}
+
+func UpdateById(id uint, model interface{}) error {
+	client := GetDB()
+	if err := client.Where("id = ?", id).Update(model).Error; err != nil {
 		fmt.Printf("Update.Err:%s\n", err)
 		return err
 	}
@@ -188,7 +201,7 @@ func Update(model interface{}) error {
 func ParseSearchMap(searchMap map[string]interface{}) (string, []interface{}) {
 	var querySql string
 	var index int = 0
-	queryArgs := make([]interface{}, len(searchMap))
+	queryArgs := make([]interface{}, 0)
 	for searchKey, searchValue := range searchMap {
 		if len(searchKey) > 0 {
 			switch vv := searchValue.(type) {
@@ -199,7 +212,7 @@ func ParseSearchMap(searchMap map[string]interface{}) (string, []interface{}) {
 					} else {
 						querySql += " AND " + searchKey + " LIKE  ? "
 					}
-					queryArgs[index] = searchValue
+					queryArgs = append(queryArgs, "%"+searchValue.(string)+"%")
 				}
 			case float64:
 				if len(querySql) == 0 {
@@ -207,36 +220,47 @@ func ParseSearchMap(searchMap map[string]interface{}) (string, []interface{}) {
 				} else {
 					querySql += " AND " + searchKey + " =  ? "
 				}
-				queryArgs[index] = searchValue
+				queryArgs = append(queryArgs, searchValue)
 			case int:
 				if len(querySql) == 0 {
 					querySql += " " + searchKey + " =  ? "
 				} else {
 					querySql += " AND " + searchKey + " =  ? "
 				}
-				queryArgs[index] = searchValue
+				queryArgs = append(queryArgs, searchValue)
 			case uint:
 				if len(querySql) == 0 {
 					querySql += " " + searchKey + " =  ? "
 				} else {
 					querySql += " AND " + searchKey + " =  ? "
 				}
-				queryArgs[index] = searchValue
+				queryArgs = append(queryArgs, searchValue)
+			case []uint:
+				if len(vv) > 0 {
+					if len(querySql) == 0 {
+						querySql += " " + searchKey + " in (?) "
+					} else {
+						querySql += " AND " + searchKey + " in (?) "
+					}
+					queryArgs = append(queryArgs, vv)
+				}
+			case []int:
+				if len(vv) > 0 {
+					if len(querySql) == 0 {
+						querySql += " " + searchKey + " in (?) "
+					} else {
+						querySql += " AND " + searchKey + " in (?) "
+					}
+					queryArgs = append(queryArgs, vv)
+				}
 			case []interface{}:
 				if len(vv) > 0 {
-					var stringSlice []string
-					for _, u := range vv {
-						stringSlice = append(stringSlice, u.(string))
+					if len(querySql) == 0 {
+						querySql += " " + searchKey + " in (?) "
+					} else {
+						querySql += " AND " + searchKey + " in (?) "
 					}
-					values := strings.Join(stringSlice, "_")
-					if len(values) > 0 {
-						if len(querySql) == 0 {
-							querySql += " " + searchKey + " in (?) "
-						} else {
-							querySql += " AND " + searchKey + " in (?) "
-						}
-						queryArgs[index] = values
-					}
+					queryArgs = append(queryArgs, vv)
 				}
 			case nil:
 				if len(querySql) == 0 {
@@ -260,7 +284,7 @@ func ParseSearchMap(searchMap map[string]interface{}) (string, []interface{}) {
 // 关闭DB
 func CloseDB() {
 	fmt.Println("<<<<<<<<<<<<<DB.close.....>>>>>>")
-	if DBClient != nil {
-		DBClient.Close()
+	if dbClient != nil {
+		dbClient.Close()
 	}
 }

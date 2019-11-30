@@ -8,9 +8,10 @@ DB:
   Url: ./db/sqlite/cool_admin.db
   Dialect: sqlite3
 
-#登入验证
-LoginValid:
-  IsValidCaptcha: false
+#验证
+Valid:
+  IsLoginValidCaptcha: false
+  IsOpenAuthorization: false
 
 #通知
 Notify:

@@ -45,6 +45,32 @@ func GetMenuById(id uint) (resultData *model.SysMenu) {
 	return resultData
 }
 
+/**
+ * 创建
+ * @method CreateMenu
+ * @param  {[type]} sysMenu model.SysMenu    [description]
+ */
+func CreateMenu(sysMenu *model.SysMenu) error {
+	err := database.Create(sysMenu)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+/**
+ * 更新
+ * @method UpdateMenu
+ * @param  {[type]} sysMenu model.SysMenu    [description]
+ */
+func UpdateMenu(sysMenu *model.SysMenu) error {
+	err := database.UpdateById(sysMenu.ID, sysMenu)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func DeleteMenuById(id uint) {
 	u := new(model.SysMenu)
 	err := database.DeleteById(id, u)
