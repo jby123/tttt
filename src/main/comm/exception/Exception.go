@@ -15,7 +15,7 @@ func BusinessException(code int, message string, args ...interface{}) {
 	if code == 0 {
 		code = utils.BUSINESS_ERROR
 	}
-	model := &Model{Code: code, Message: message, args: args}
+	model := Model{Code: code, Message: message, args: args}
 	panic(model)
 }
 
@@ -26,7 +26,7 @@ func SystemException(message string) {
 	if len(message) == 0 {
 		message = utils.SYSTEM_MESSAGE
 	}
-	model := &Model{Code: utils.SYSTEM_ERROR_CODE, Message: message, args: nil}
+	model := Model{Code: utils.SYSTEM_ERROR_CODE, Message: message, args: nil}
 	panic(model)
 }
 
@@ -34,7 +34,7 @@ func SystemException(message string) {
  * 未授权异常
  */
 func UnAuthorizationException() {
-	model := &Model{Code: 404, Message: "account.not.authorization"}
+	model := Model{Code: 404, Message: "account.not.authorization"}
 	panic(model)
 }
 
@@ -42,7 +42,7 @@ func UnAuthorizationException() {
  * token过期异常
  */
 func TokenExpiredException() {
-	model := &Model{Code: 404, Message: "account.not.authorization"}
+	model := Model{Code: 404, Message: "account.not.authorization"}
 	panic(model)
 }
 
@@ -50,6 +50,6 @@ func TokenExpiredException() {
  * 登入账号异常
  */
 func LoginAccountException() {
-	model := &Model{Code: 1000, Message: "account.or.password.exception"}
+	model := Model{Code: 1000, Message: "account.or.password.exception"}
 	panic(model)
 }
