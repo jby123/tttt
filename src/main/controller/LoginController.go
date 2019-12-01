@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/mojocn/base64Captcha"
 	"goAdmin/src/main/comm/config"
+	"goAdmin/src/main/comm/exception"
 	"goAdmin/src/main/model"
 	"goAdmin/src/main/service"
 	"goAdmin/src/main/utils"
@@ -29,6 +30,7 @@ type LoginRespVo struct {
  */
 func Login() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		exception.BusinessException(0, "panic.exception")
 		var loginReq LoginReq
 		error := ctx.BindJSON(&loginReq)
 		if error != nil {
@@ -64,7 +66,7 @@ func Login() gin.HandlerFunc {
 }
 
 //生成令牌
-func GenerateToken(c *gin.Context, user model.SysUser) {
+func GenerateToken(c *gin.Context, user *model.SysUser) {
 	jwt := utils.JWT{SigningKey: []byte(utils.SignKey)}
 
 	var expiresAt int64 = int64(utils.DEFAULT_EXPIRE_HOURE_TIME) // 过期时间 一小时

@@ -2,8 +2,8 @@ package service
 
 import (
 	"fmt"
-	"github.com/jameskeane/bcrypt"
 	"goAdmin/src/main/comm/database"
+	"goAdmin/src/main/comm/exception"
 	"goAdmin/src/main/model"
 	"goAdmin/src/main/utils"
 	"strconv"
@@ -90,13 +90,13 @@ func GetUserById(id uint) (user *model.SysUser) {
  * @method GetUserByUserName
  * @param  {[type]}       user  *SysUser [description]
  */
-func GetUserByUserName(username string) *model.SysUser {
+func GetUserByUserName(username string) (*model.SysUser, bool, error) {
 	user := &model.SysUser{Username: username}
 	if err := database.GetDB().First(user).Error; err != nil {
-		fmt.Printf("GetByUserName.Err:%s", err)
+		return nil, false, err
 	}
 
-	return user
+	return user, true, nil
 }
 
 func DeleteUserByParams(searchMap map[string]interface{}) {
@@ -115,14 +115,10 @@ func DeleteUserById(id uint) error {
 /**
  * 创建
  * @method CreateUser
- * @param  {[type]} kw string [description]
- * @param  {[type]} cp int    [description]
- * @param  {[type]} mp int    [description]
+ * @param  {[type]} sysUser model.SysUser [description]
  */
 func CreateUser(sysUser *model.SysUser) error {
-	salt, _ := bcrypt.Salt(10)
-	hash, _ := bcrypt.Hash(sysUser.Password, salt)
-	sysUser.Password = hash
+	sysUser.Password = utils.EncodeMD5(sysUser.Password)
 	err := database.Create(sysUser)
 	if err != nil {
 		return err
@@ -133,14 +129,11 @@ func CreateUser(sysUser *model.SysUser) error {
 /**
  * 更新
  * @method UpdateUser
- * @param  {[type]} kw string [description]
- * @param  {[type]} cp int    [description]
- * @param  {[type]} mp int    [description]
+ * @param  {[type]} sysUser model.SysUser [description]
  */
 func UpdateUser(sysUser *model.SysUser) error {
-	salt, _ := bcrypt.Salt(10)
-	hash, _ := bcrypt.Hash(sysUser.Password, salt)
-	sysUser.Password = hash
+
+	sysUser.Password = utils.EncodeMD5(sysUser.Password)
 
 	err := database.UpdateById(sysUser.ID, sysUser)
 	if err != nil {
@@ -168,12 +161,16 @@ func checkLogin(username string) model.SysUser {
  * @param  {[type]}  id       int    [description]
  * @param  {[type]}  password string [description]
  */
-func Login(username, password string) (status bool, user model.SysUser, err error) {
-	user = checkLogin(username)
-	if user.ID == 0 {
-		return false, user, err
+func Login(username, password string) (status bool, user *model.SysUser, err error) {
+	user, status, err = GetUserByUserName(username)
+	if status {
+		panic(exception.LoginAccountException)
+		return
 	} else {
-		return true, user, err
-
+		if utils.VerifyMD5(password, user.Password) {
+			return true, user, err
+		}
+		exception.LoginAccountException()
+		return
 	}
 }
