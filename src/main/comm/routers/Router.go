@@ -10,8 +10,6 @@ import (
 func RegisterRoute(application *gin.Engine) {
 	//拦截器：全局日志中间件
 	application.Use(gin.Logger())
-	//拦截器：全局异常恢复中间件
-	application.Use(middleware.ExceptionHandler())
 	//拦截器：全局黑名单中间件
 	application.Use(middleware.IPBlackHandler())
 	//拦截器：全局I18N中间件
@@ -20,7 +18,8 @@ func RegisterRoute(application *gin.Engine) {
 	application.Use(middleware.CorsHandler())
 	//拦截器：全局日志中间件
 	application.Use(middleware.LogHandler())
-
+	//拦截器：全局异常中间件
+	application.Use(middleware.ExceptionHandler())
 	// register 404 NotFound
 	application.NoRoute(middleware.GlobalNoRouteHandler)
 

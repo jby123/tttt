@@ -91,8 +91,8 @@ func GetUserById(id uint) (user *model.SysUser) {
  * @param  {[type]}       user  *SysUser [description]
  */
 func GetUserByUserName(username string) (*model.SysUser, bool, error) {
-	user := &model.SysUser{Username: username}
-	if err := database.GetDB().First(user).Error; err != nil {
+	user := &model.SysUser{}
+	if err := database.GetDB().Where("username = ?", username).First(user).Error; err != nil {
 		return nil, false, err
 	}
 
@@ -163,14 +163,12 @@ func checkLogin(username string) model.SysUser {
  */
 func Login(username, password string) (status bool, user *model.SysUser, err error) {
 	user, status, err = GetUserByUserName(username)
-	if status {
-		panic(exception.LoginAccountException)
-		return
-	} else {
-		if utils.VerifyMD5(password, user.Password) {
-			return true, user, err
-		}
+	if !status {
 		exception.LoginAccountException()
-		return
+	} else {
+		if !utils.VerifyMD5(password, user.Password) {
+			exception.LoginAccountException()
+		}
 	}
+	return true, user, err
 }

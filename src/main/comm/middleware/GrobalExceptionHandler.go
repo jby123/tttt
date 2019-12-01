@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"goAdmin/src/main/comm/exception"
 	"goAdmin/src/main/utils"
@@ -18,10 +19,12 @@ func ExceptionHandler() gin.HandlerFunc {
 				switch err.(type) {
 				case exception.Model:
 					exceptionModel := err.(exception.Model)
+					fmt.Println("global.exception.error.{}", exceptionModel.Message)
 					//能知道 err 所屬 code ,msg
 					context.JSON(http.StatusBadRequest, utils.Error(exceptionModel.Code, exceptionModel.Message, nil))
 					context.Abort()
 				default:
+					fmt.Println("global.exception.default.error.{}", err.(string))
 					//能知道 err 所屬 code ,msg
 					context.JSON(utils.SYSTEM_ERROR_CODE, utils.Error(utils.SYSTEM_ERROR_CODE, err.(string), nil))
 					context.Abort()
