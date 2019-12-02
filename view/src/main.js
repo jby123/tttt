@@ -7,7 +7,7 @@ import store from '@/store'         // api: https://github.com/vuejs/vuex
 import VueCookie from 'vue-cookie'  // api: https://github.com/alfhen/vue-cookie
 import '@/element-ui'               // api: https://github.com/ElemeFE/element
 import '@/icons'                    // api: http://www.iconfont.cn/
-import '@/assets/scss/index.scss'
+import '@/styles/scss/index.scss'
 import { isAuth } from '@/utils'
 
 import echarts from 'echarts'
