@@ -18,13 +18,14 @@ type DbConfig struct {
 }
 
 type MysqlConf struct {
-	DriverName string `yaml:"DriverName"`
-	Url        string `yaml:"Url"`
-	Username   string `yaml:"Username"`
-	Password   string `yaml:"Password"`
-	Dialect    string `yaml:"Dialect"`
-	MaxIdle    int    `yaml:"maxIdle"`
-	MaxOpen    int    `yaml:"maxOpen"`
+	AutoCreateTable bool   `yaml:"AutoCreateTable"`
+	DriverName      string `yaml:"DriverName"`
+	Url             string `yaml:"Url"`
+	Username        string `yaml:"Username"`
+	Password        string `yaml:"Password"`
+	Dialect         string `yaml:"Dialect"`
+	MaxIdle         int    `yaml:"maxIdle"`
+	MaxOpen         int    `yaml:"maxOpen"`
 }
 
 // 初始化 DB 连接
