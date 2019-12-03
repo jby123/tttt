@@ -1,4 +1,4 @@
-package utils
+package database
 
 type PaginationVo struct {
 	List interface{} `json:"list"`

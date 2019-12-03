@@ -18,13 +18,14 @@ type DbConfig struct {
 }
 
 type MysqlConf struct {
-	DriverName string `yaml:"DriverName"`
-	Url        string `yaml:"Url"`
-	Username   string `yaml:"Username"`
-	Password   string `yaml:"Password"`
-	Dialect    string `yaml:"Dialect"`
-	MaxIdle    int    `yaml:"maxIdle"`
-	MaxOpen    int    `yaml:"maxOpen"`
+	AutoCreateTable bool   `yaml:"AutoCreateTable"`
+	DriverName      string `yaml:"DriverName"`
+	Url             string `yaml:"Url"`
+	Username        string `yaml:"Username"`
+	Password        string `yaml:"Password"`
+	Dialect         string `yaml:"Dialect"`
+	MaxIdle         int    `yaml:"maxIdle"`
+	MaxOpen         int    `yaml:"maxOpen"`
 }
 
 // 初始化 DB 连接
@@ -88,6 +89,23 @@ func GetDB() *gorm.DB {
 }
 
 type SearchMap map[string]interface{}
+
+func FindCommPage(searchMap map[string]interface{}, order, sort string, offset, limit int, resultDataList interface{}) (page *PaginationVo) {
+	err := FindPage(searchMap, sort, sort, offset, limit).Find(&resultDataList).Error
+	if err != nil {
+		return Pagination(resultDataList, offset, limit, 0)
+	}
+	var resultData interface{}
+	switch resultDataValues := resultDataList.(type) {
+	case []interface{}:
+		for _, v := range resultDataValues {
+			resultData = v
+			break
+		}
+	}
+	total := Count(searchMap, resultData)
+	return Pagination(resultDataList, offset, limit, total)
+}
 
 /**
  * 获取列表
@@ -166,6 +184,13 @@ func DeleteById(id uint, model interface{}) error {
 	client := GetDB()
 	if err := client.Where("id = ?", id).Delete(model).Error; err != nil {
 		fmt.Printf("DeleteById.Err:%s\n", err)
+		return err
+	}
+	return nil
+}
+func DeleteByIds(ids []int, model interface{}) error {
+	client := GetDB()
+	if err := client.Where("id in (?)", ids).Delete(model).Error; err != nil {
 		return err
 	}
 	return nil

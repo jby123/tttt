@@ -7,9 +7,8 @@ import (
 	"goAdmin/src/main/model"
 	"goAdmin/src/main/service"
 	"goAdmin/src/main/utils"
+	"goAdmin/src/main/utils/request"
 	"net/http"
-	"strconv"
-	"strings"
 )
 
 /**
@@ -27,18 +26,7 @@ func PageUsers() gin.HandlerFunc {
 		basePageReq := req.ParsePageReq(ctx)
 		var deptIdList []int
 		if departmentIdsStr, isExist := ctx.GetQuery("departmentIds"); isExist {
-			if len(departmentIdsStr) > 0 {
-				var departmentIds []string = strings.Split(departmentIdsStr, ",")
-				deptIdList = make([]int, len(departmentIds))
-				var index int = 0
-				for _, departmentIdStr := range departmentIds {
-					departmentId, err := strconv.Atoi(departmentIdStr)
-					if err == nil {
-						deptIdList[index] = departmentId
-					}
-					index++
-				}
-			}
+			deptIdList = request.ParseStrToIds(departmentIdsStr)
 		}
 		page := service.FindUserByPage(deptIdList, basePageReq.KeyWord, basePageReq.Order, basePageReq.Sort, basePageReq.Page, basePageReq.Size)
 		ctx.JSON(http.StatusOK, utils.Success(page))
@@ -48,7 +36,7 @@ func PageUsers() gin.HandlerFunc {
 func ListUsers() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		ctx.Status(http.StatusOK)
-		ctx.JSON(http.StatusOK, nil)
+		ctx.JSON(http.StatusOK, utils.Success(nil))
 	}
 }
 
@@ -64,19 +52,7 @@ func ListUsers() gin.HandlerFunc {
  */
 func GetUser() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		idStr, _ := ctx.GetQuery("id")
-		if len(idStr) <= 0 {
-			ctx.Status(http.StatusBadRequest)
-			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
-			return
-		}
-		userId, err := strconv.Atoi(idStr)
-		if err != nil {
-			ctx.Status(http.StatusBadRequest)
-			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
-			return
-		}
-		ctx.Status(http.StatusOK)
+		userId := request.ParseRequestId(ctx)
 		ctx.JSON(http.StatusOK, service.GetUserById(uint(userId)))
 	}
 }
@@ -99,7 +75,7 @@ func CreateUser() gin.HandlerFunc {
 		error := ctx.BindJSON(&sysUser)
 		if error != nil {
 			fmt.Printf("CreateUser.bind.error.%s \n", error)
-			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
+			ctx.JSON(http.StatusOK, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
 			return
 		}
 		service.CreateUser(&sysUser)
@@ -125,7 +101,7 @@ func UpdateUser() gin.HandlerFunc {
 		error := ctx.BindJSON(&sysUser)
 		if error != nil {
 			fmt.Printf("CreateUser.bind.error.%s \n", error)
-			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
+			ctx.JSON(http.StatusOK, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
 			return
 		}
 		service.UpdateUser(&sysUser)
@@ -145,25 +121,8 @@ func UpdateUser() gin.HandlerFunc {
  */
 func DeleteUser() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var deleteReq req.BaseDeleteReq
-		error := ctx.BindJSON(&deleteReq)
-		if error != nil {
-			fmt.Printf("DeleteUser.bind.error.%s \n", error)
-			ctx.Status(http.StatusBadRequest)
-			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
-			return
-		}
-
-		if len(deleteReq.Ids) > 0 {
-			var userIds []string = strings.Split(deleteReq.Ids, ",")
-			for _, userIdStr := range userIds {
-				userId, err := strconv.Atoi(userIdStr)
-				if err == nil {
-					service.DeleteUserById(uint(userId))
-				}
-			}
-		}
-		ctx.Status(http.StatusOK)
-		ctx.JSON(http.StatusOK, nil)
+		ids := request.ParseRequestIds(ctx)
+		service.DeleteUserByIds(ids)
+		ctx.JSON(http.StatusOK, utils.Success(nil))
 	}
 }

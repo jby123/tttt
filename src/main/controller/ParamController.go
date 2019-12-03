@@ -7,9 +7,8 @@ import (
 	"goAdmin/src/main/model"
 	"goAdmin/src/main/service"
 	"goAdmin/src/main/utils"
+	"goAdmin/src/main/utils/request"
 	"net/http"
-	"strconv"
-	"strings"
 )
 
 /**
@@ -25,16 +24,7 @@ func PageParams() gin.HandlerFunc {
 
 func GetParam() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		idStr, _ := ctx.GetQuery("id")
-		if len(idStr) <= 0 {
-			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
-			return
-		}
-		paramId, err := strconv.Atoi(idStr)
-		if err != nil {
-			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
-			return
-		}
+		paramId := request.ParseRequestId(ctx)
 		ctx.JSON(http.StatusOK, service.GetParamById(uint(paramId)))
 	}
 }
@@ -45,7 +35,7 @@ func CreateParam() gin.HandlerFunc {
 		error := ctx.BindJSON(&sysParam)
 		if error != nil {
 			fmt.Printf("CreateParam.bind.error.%s \n", error)
-			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
+			ctx.JSON(http.StatusOK, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
 			return
 		}
 		service.CreateParam(&sysParam)
@@ -59,7 +49,7 @@ func UpdateParam() gin.HandlerFunc {
 		error := ctx.BindJSON(&sysParam)
 		if error != nil {
 			fmt.Printf("UpdateParam.bind.error.%s \n", error)
-			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
+			ctx.JSON(http.StatusOK, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
 			return
 		}
 		service.UpdateParam(&sysParam)
@@ -69,25 +59,10 @@ func UpdateParam() gin.HandlerFunc {
 
 func DeleteParam() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var deleteReq req.BaseDeleteReq
-		error := ctx.BindJSON(&deleteReq)
-		if error != nil {
-			fmt.Printf("DeleteParam.bind.error.%s \n", error)
-			ctx.Status(http.StatusBadRequest)
-			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
-			return
+		paramIds := request.ParseRequestIds(ctx)
+		for _, paramId := range paramIds {
+			service.DeleteParamById(uint(paramId))
 		}
-
-		if len(deleteReq.Ids) > 0 {
-			var paramIds []string = strings.Split(deleteReq.Ids, ",")
-			for _, paramIdStr := range paramIds {
-				paramId, err := strconv.Atoi(paramIdStr)
-				if err == nil {
-					service.DeleteParamById(uint(paramId))
-				}
-			}
-		}
-		ctx.Status(http.StatusOK)
-		ctx.JSON(http.StatusOK, nil)
+		ctx.JSON(http.StatusOK, utils.Success(nil))
 	}
 }

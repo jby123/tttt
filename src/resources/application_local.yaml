@@ -5,8 +5,13 @@ Cache:
   Pwd:
 
 DB:
-  Url: ./db/sqlite/cool_admin.db
-  Dialect: sqlite3
+  AutoCreateTable: true
+  DriverName: com.mysql.jdbc.Driver
+  Database: cool_admin
+  Url: root:zjj930716.@/cool_admin?charset=utf8&parseTime=True&loc=Local
+  Username: root
+  Password: zjj930716.
+  Dialect: mysql
 
 #验证
 Valid:

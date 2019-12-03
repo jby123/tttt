@@ -24,7 +24,7 @@ func IPWhiteHandler() gin.HandlerFunc {
 			}
 		}
 		if !flag {
-			ctx.JSON(http.StatusUnauthorized, utils.Error(401, clientIp+",不在白名单中拒绝访问", nil))
+			ctx.JSON(http.StatusOK, utils.Error(401, clientIp+",不在白名单中拒绝访问", nil))
 			ctx.Abort()
 			return
 		}
@@ -47,7 +47,7 @@ func IPBlackHandler() gin.HandlerFunc {
 			}
 		}
 		if flag {
-			ctx.JSON(http.StatusUnauthorized, utils.Error(401, clientIp+",在黑名单中，拒绝访问", nil))
+			ctx.JSON(http.StatusOK, utils.Error(401, clientIp+",在黑名单中，拒绝访问", nil))
 			ctx.Abort()
 			return
 		}

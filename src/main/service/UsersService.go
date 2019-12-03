@@ -20,7 +20,7 @@ import (
  * @param  {[type]} pageNum int    [description]
  * @param  {[type]} pageSize int    [description]
  */
-func FindUserByPage(departmentIds []int, name, order, sort string, pageNum, pageSize int) (page *utils.PaginationVo) {
+func FindUserByPage(departmentIds []int, name, order, sort string, pageNum, pageSize int) (page *database.PaginationVo) {
 
 	var resultDataList []*model.SysUserVo
 
@@ -30,7 +30,7 @@ func FindUserByPage(departmentIds []int, name, order, sort string, pageNum, page
 	searchMap["department_id"] = departmentIds
 	total := database.Count(searchMap, &model.SysUser{})
 	if total == 0 {
-		return utils.Pagination(resultDataList, pageNum, pageSize, 0)
+		return database.Pagination(resultDataList, pageNum, pageSize, 0)
 	}
 	queryArgs := make([]interface{}, 0)
 	var sql string = ` SELECT u.*, GROUP_CONCAT(r.name) AS role_name, d.name AS department_name `
@@ -57,9 +57,9 @@ func FindUserByPage(departmentIds []int, name, order, sort string, pageNum, page
 	err := database.GetDB().Raw(sql, queryArgs...).Scan(&resultDataList).Error
 	if err != nil {
 		fmt.Printf("FindByPage.Error:%s\n", err)
-		return utils.Pagination(resultDataList, pageNum, pageSize, 0)
+		return database.Pagination(resultDataList, pageNum, pageSize, 0)
 	}
-	return utils.Pagination(resultDataList, pageNum, pageSize, total)
+	return database.Pagination(resultDataList, pageNum, pageSize, total)
 }
 
 func FindUserCount(departmentId int, name string) int {
@@ -110,6 +110,11 @@ func DeleteUserByParams(searchMap map[string]interface{}) {
 func DeleteUserById(id uint) error {
 	u := new(model.SysUser)
 	return database.DeleteById(id, u)
+}
+
+func DeleteUserByIds(ids []int) error {
+	u := new(model.SysUser)
+	return database.DeleteByIds(ids, u)
 }
 
 /**

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"goAdmin/src/main/comm/database"
 	"goAdmin/src/main/model"
-	"goAdmin/src/main/utils"
 )
 
 /**
@@ -15,16 +14,16 @@ import (
  * @param  {[type]} pageNum int    [description]
  * @param  {[type]} pageSize int    [description]
  */
-func FindParamByPage(name, order, sort string, pageNum, pageSize int) (page *utils.PaginationVo) {
+func FindParamByPage(name, order, sort string, pageNum, pageSize int) (page *database.PaginationVo) {
 	searchMap := make(map[string]interface{})
 	searchMap["name"] = name
 	var resultDataList []*model.SysParam
 	if err := database.FindPage(searchMap, sort, sort, pageNum, pageSize).Find(&resultDataList).Error; err != nil {
 		fmt.Printf("FindParamByPage.Error:%s\n", err)
-		return utils.Pagination(resultDataList, pageNum, pageSize, 0)
+		return database.Pagination(resultDataList, pageNum, pageSize, 0)
 	}
 	total := database.Count(searchMap, &model.SysParam{})
-	return utils.Pagination(resultDataList, pageNum, pageSize, total)
+	return database.Pagination(resultDataList, pageNum, pageSize, total)
 }
 
 func GetParamById(id uint) (resultData *model.SysParam) {

@@ -8,8 +8,7 @@ import (
 )
 
 func Logout(ctx gin.Context) {
-	ctx.Status(http.StatusOK)
-	ctx.JSON(utils.SuccessCode, nil)
+	ctx.JSON(http.StatusOK, utils.Success(nil))
 }
 
 /**

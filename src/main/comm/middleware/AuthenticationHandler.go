@@ -5,7 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"goAdmin/src/main/utils"
-	"net/http"
 )
 
 /**
@@ -25,7 +24,7 @@ func ValidateToken() gin.HandlerFunc {
 		fmt.Println("<<<<<<<<<<authentication.begin>>>>>>>>>>>>>>")
 		token := context.Request.Header.Get("authorization")
 		if token == "" {
-			context.JSON(http.StatusUnauthorized, utils.Error(401, "请求未携带token，无权限访问", nil))
+			utils.ResultError(context, utils.BUSINESS_ERROR, "参数异常[请求未携带token，无权限访问]", nil)
 			context.Abort()
 			return
 		}
@@ -34,12 +33,11 @@ func ValidateToken() gin.HandlerFunc {
 		claims, err := j.ParseToken(token)
 		if err != nil {
 			if err == utils.TokenExpired {
-				context.JSON(http.StatusUnauthorized, utils.Error(401, "token.expire", nil))
+				utils.ResultError(context, 401, "token.expire", nil)
 				context.Abort()
 				return
 			}
-			fmt.Printf("Validate.token.error.%s\n", err)
-			context.JSON(http.StatusOK, utils.Error(500, err.Error(), nil))
+			utils.ResultError(context, utils.SYSTEM_ERROR_CODE, err.Error(), nil)
 			context.Abort()
 			return
 		}

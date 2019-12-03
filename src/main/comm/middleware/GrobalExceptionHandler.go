@@ -5,7 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"goAdmin/src/main/comm/exception"
 	"goAdmin/src/main/utils"
-	"net/http"
 )
 
 /**
@@ -21,12 +20,12 @@ func ExceptionHandler() gin.HandlerFunc {
 					exceptionModel := err.(exception.Model)
 					fmt.Println("global.exception.error.{}", exceptionModel.Message)
 					//能知道 err 所屬 code ,msg
-					context.JSON(http.StatusBadRequest, utils.Error(exceptionModel.Code, exceptionModel.Message, nil))
+					utils.ResultError(context, exceptionModel.Code, exceptionModel.Message, nil)
 					context.Abort()
 				default:
 					fmt.Println("global.exception.default.error.{}", err.(string))
 					//能知道 err 所屬 code ,msg
-					context.JSON(utils.SYSTEM_ERROR_CODE, utils.Error(utils.SYSTEM_ERROR_CODE, err.(string), nil))
+					utils.ResultError(context, utils.SYSTEM_ERROR_CODE, err.(string), nil)
 					context.Abort()
 				}
 			}
