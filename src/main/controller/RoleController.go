@@ -7,9 +7,8 @@ import (
 	"goAdmin/src/main/model"
 	"goAdmin/src/main/service"
 	"goAdmin/src/main/utils"
+	"goAdmin/src/main/utils/request"
 	"net/http"
-	"strconv"
-	"strings"
 )
 
 /**
@@ -33,19 +32,7 @@ func ListRoles() gin.HandlerFunc {
 
 func GetRole() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		idStr, _ := ctx.GetQuery("id")
-		if len(idStr) <= 0 {
-			ctx.Status(http.StatusBadRequest)
-			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
-			return
-		}
-		roleId, err := strconv.Atoi(idStr)
-		if err != nil {
-			ctx.Status(http.StatusBadRequest)
-			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
-			return
-		}
-		ctx.Status(http.StatusOK)
+		roleId := request.ParseRequestId(ctx)
 		ctx.JSON(http.StatusOK, service.GetRoleById(uint(roleId)))
 	}
 }
@@ -56,7 +43,7 @@ func CreateRole() gin.HandlerFunc {
 		error := ctx.BindJSON(&sysRole)
 		if error != nil {
 			fmt.Printf("CreateRole.bind.error.%s \n", error)
-			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
+			ctx.JSON(http.StatusOK, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
 			return
 		}
 		service.CreateRole(&sysRole)
@@ -70,7 +57,7 @@ func UpdateRole() gin.HandlerFunc {
 		error := ctx.BindJSON(&sysRole)
 		if error != nil {
 			fmt.Printf("CreateRole.bind.error.%s \n", error)
-			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
+			ctx.JSON(http.StatusOK, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
 			return
 		}
 		service.UpdateRole(&sysRole)
@@ -80,25 +67,10 @@ func UpdateRole() gin.HandlerFunc {
 
 func DeleteRole() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var deleteReq req.BaseDeleteReq
-		error := ctx.BindJSON(&deleteReq)
-		if error != nil {
-			fmt.Printf("DeleteRole.bind.error.%s \n", error)
-			ctx.Status(http.StatusBadRequest)
-			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
-			return
+		roleIds := request.ParseRequestIds(ctx)
+		for _, roleId := range roleIds {
+			service.DeleteRoleById(uint(roleId))
 		}
-
-		if len(deleteReq.Ids) > 0 {
-			var roleIds []string = strings.Split(deleteReq.Ids, ",")
-			for _, roleIdStr := range roleIds {
-				roleId, err := strconv.Atoi(roleIdStr)
-				if err == nil {
-					service.DeleteRoleById(uint(roleId))
-				}
-			}
-		}
-		ctx.Status(http.StatusOK)
-		ctx.JSON(http.StatusOK, nil)
+		ctx.JSON(http.StatusOK, utils.Success(nil))
 	}
 }

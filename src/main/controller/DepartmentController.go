@@ -1,15 +1,13 @@
 package controller
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"goAdmin/src/main/controller/vo/req"
 	"goAdmin/src/main/model"
 	"goAdmin/src/main/service"
 	"goAdmin/src/main/utils"
+	"goAdmin/src/main/utils/request"
 	"net/http"
-	"strconv"
-	"strings"
 )
 
 /**
@@ -33,19 +31,7 @@ func ListDepartments() gin.HandlerFunc {
 
 func GetDepartment() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		idStr, _ := ctx.GetQuery("id")
-		if len(idStr) <= 0 {
-			ctx.Status(http.StatusBadRequest)
-			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
-			return
-		}
-		deptId, err := strconv.Atoi(idStr)
-		if err != nil {
-			ctx.Status(http.StatusBadRequest)
-			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
-			return
-		}
-		ctx.Status(http.StatusOK)
+		deptId := request.ParseRequestId(ctx)
 		ctx.JSON(http.StatusOK, service.GetDeptById(uint(deptId)))
 	}
 }
@@ -55,8 +41,7 @@ func CreateDepartment() gin.HandlerFunc {
 		var sysDept model.SysDepartment
 		error := ctx.BindJSON(&sysDept)
 		if error != nil {
-			fmt.Printf("CreateDepartment.bind.error.%s \n", error)
-			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
+			ctx.JSON(http.StatusOK, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
 			return
 		}
 		service.CreateDept(&sysDept)
@@ -69,8 +54,7 @@ func UpdateDepartment() gin.HandlerFunc {
 		var sysDept model.SysDepartment
 		error := ctx.BindJSON(&sysDept)
 		if error != nil {
-			fmt.Printf("UpdateDepartment.bind.error.%s \n", error)
-			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
+			ctx.JSON(http.StatusOK, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
 			return
 		}
 		service.UpdateDept(&sysDept)
@@ -80,25 +64,10 @@ func UpdateDepartment() gin.HandlerFunc {
 
 func DeleteDepartment() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var deleteReq req.BaseDeleteReq
-		error := ctx.BindJSON(&deleteReq)
-		if error != nil {
-			fmt.Printf("DeleteMenu.bind.error.%s \n", error)
-			ctx.Status(http.StatusBadRequest)
-			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
-			return
+		deptIds := request.ParseRequestIds(ctx)
+		for _, deptId := range deptIds {
+			service.DeleteDeptById(uint(deptId))
 		}
-
-		if len(deleteReq.Ids) > 0 {
-			var deptIds []string = strings.Split(deleteReq.Ids, ",")
-			for _, deptIdStr := range deptIds {
-				deptId, err := strconv.Atoi(deptIdStr)
-				if err == nil {
-					service.DeleteDeptById(uint(deptId))
-				}
-			}
-		}
-		ctx.Status(http.StatusOK)
 		ctx.JSON(http.StatusOK, nil)
 	}
 }

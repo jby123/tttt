@@ -3,8 +3,17 @@ package utils
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"net/http"
 	"reflect"
 )
+
+func ResultSuccess(ctx *gin.Context, objects interface{}) {
+	ctx.JSON(http.StatusOK, Success(objects))
+}
+
+func ResultError(ctx *gin.Context, status int, message string, data interface{}) {
+	ctx.JSON(http.StatusOK, Error(status, message, data))
+}
 
 func Success(objects interface{}) map[string]interface{} {
 	return gin.H{

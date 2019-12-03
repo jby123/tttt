@@ -33,14 +33,12 @@ func Login() gin.HandlerFunc {
 		error := ctx.BindJSON(&loginReq)
 		if error != nil {
 			fmt.Printf("login.bind.error.%s \n", error)
-			ctx.Status(http.StatusBadRequest)
-			ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
+			ctx.JSON(http.StatusOK, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
 			return
 		}
 		if config.CommConfig.Valid.IsLoginValidCaptcha {
 			if len(loginReq.CaptchaId) <= 0 {
-				ctx.Status(http.StatusBadRequest)
-				ctx.JSON(http.StatusBadRequest, utils.Error(utils.BUSINESS_ERROR, "验证码不能为空", nil))
+				ctx.JSON(http.StatusOK, utils.Error(utils.BUSINESS_ERROR, "验证码不能为空", nil))
 				return
 			}
 			//比较验证码

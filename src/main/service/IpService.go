@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"goAdmin/src/main/comm/database"
 	"goAdmin/src/main/model"
-	"goAdmin/src/main/utils"
 	"strconv"
 )
 
@@ -17,16 +16,16 @@ import (
  * @param  {[type]} pageNum int    [description]
  * @param  {[type]} pageSize int    [description]
  */
-func FindIpByPage(name, order, sort string, pageNum, pageSize int) (page *utils.PaginationVo) {
+func FindIpByPage(name, order, sort string, pageNum, pageSize int) (page *database.PaginationVo) {
 	searchMap := make(map[string]interface{})
 	searchMap["ip"] = name
 	var resultDataList []*model.SysIp
 	if err := database.FindPage(searchMap, sort, sort, pageNum, pageSize).Find(&resultDataList).Error; err != nil {
 		fmt.Printf("FindIpByPage.Error:%s\n", err)
-		return utils.Pagination(resultDataList, pageNum, pageSize, 0)
+		return database.Pagination(resultDataList, pageNum, pageSize, 0)
 	}
 	total := database.Count(searchMap, &model.SysIp{})
-	return utils.Pagination(resultDataList, pageNum, pageSize, total)
+	return database.Pagination(resultDataList, pageNum, pageSize, total)
 }
 
 func FindIpList(ipType int) (sysIp []*model.SysIp) {

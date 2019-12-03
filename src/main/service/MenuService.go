@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"goAdmin/src/main/comm/database"
 	"goAdmin/src/main/model"
-	"goAdmin/src/main/utils"
 )
 
 /**
@@ -16,16 +15,16 @@ import (
  * @param  {[type]} pageNum int    [description]
  * @param  {[type]} pageSize int    [description]
  */
-func FindMenuByPage(name, order, sort string, pageNum, pageSize int) (page *utils.PaginationVo) {
+func FindMenuByPage(name, order, sort string, pageNum, pageSize int) (page *database.PaginationVo) {
 	searchMap := make(map[string]interface{})
 	searchMap["name"] = name
 	var resultDataList []*model.SysMenu
 	if err := database.FindPage(searchMap, sort, sort, pageNum, pageSize).Find(&resultDataList).Error; err != nil {
 		fmt.Printf("FindLogByPage.Error:%s\n", err)
-		return utils.Pagination(resultDataList, pageNum, pageSize, 0)
+		return database.Pagination(resultDataList, pageNum, pageSize, 0)
 	}
 	total := database.Count(searchMap, &model.SysMenu{})
-	return utils.Pagination(resultDataList, pageNum, pageSize, total)
+	return database.Pagination(resultDataList, pageNum, pageSize, total)
 }
 
 func FindMenuListByParam(searchMap map[string]interface{}) (err error, resultDataList []*model.SysMenu) {
