@@ -8,7 +8,7 @@ import (
 )
 
 func GlobalNoRouteHandler(context *gin.Context) {
-	fmt.Println("GlobalNoRouteHandler request....<<<<<GlobalNoRouteHandler.end>>>>")
+	fmt.Println("GlobalNoRouteHandler request.." + context.Request.RequestURI + "..<<<<<GlobalNoRouteHandler.end>>>>")
 	context.JSON(http.StatusNotFound, utils.Error(http.StatusBadRequest, "NOT.FOUND", nil))
 	return
 }

@@ -3,6 +3,11 @@ package comm
 type Conf struct {
 	Notify IsOpenNotify `yaml:"Notify"`
 	Valid  ValidConfig  `yaml:"Valid"`
+	Iris   IrisConf     `yaml:"Iris"`
+}
+
+type IrisConf struct {
+	BasePath string `yaml:"BasePath"`
 }
 
 type ValidConfig struct {

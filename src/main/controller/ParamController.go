@@ -25,7 +25,7 @@ func PageParams() gin.HandlerFunc {
 func GetParam() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		paramId := request.ParseRequestId(ctx)
-		ctx.JSON(http.StatusOK, service.GetParamById(uint(paramId)))
+		utils.ResultSuccess(ctx, service.GetParamById(uint(paramId)))
 	}
 }
 

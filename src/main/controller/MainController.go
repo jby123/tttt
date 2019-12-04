@@ -22,8 +22,10 @@ func CurrentAuthorizationMenus() gin.HandlerFunc {
 			return
 		}
 		customClaims := claimsData.(*utils.CustomClaims)
+
 		//1.获取所有的菜单列表
-		menuList, _ := service.FindMenuListByParam(nil)
+		_, menuList := service.FindMenuListByParam(nil)
+
 		//2.获取用户对应的权限列表
 		permsList, _ := service.FindPermsByUserId(customClaims.ID)
 		var resultMap map[string]interface{} = make(map[string]interface{})

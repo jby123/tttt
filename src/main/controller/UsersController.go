@@ -35,7 +35,6 @@ func PageUsers() gin.HandlerFunc {
 
 func ListUsers() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		ctx.Status(http.StatusOK)
 		ctx.JSON(http.StatusOK, utils.Success(nil))
 	}
 }
@@ -53,7 +52,7 @@ func ListUsers() gin.HandlerFunc {
 func GetUser() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		userId := request.ParseRequestId(ctx)
-		ctx.JSON(http.StatusOK, service.GetUserById(uint(userId)))
+		utils.ResultSuccess(ctx, service.GetUserById(uint(userId)))
 	}
 }
 

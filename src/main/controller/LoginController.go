@@ -13,7 +13,7 @@ import (
 )
 
 type LoginReq struct {
-	CaptchaId  string `json:"captchaId" binding:"required"`
+	CaptchaId  string `json:"captchaId"`
 	Password   string `json:"password" binding:"required"`
 	Username   string `json:"username" binding:"required"`
 	VerifyCode string `json:"verifyCode"`

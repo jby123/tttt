@@ -32,7 +32,7 @@ func ListDepartments() gin.HandlerFunc {
 func GetDepartment() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		deptId := request.ParseRequestId(ctx)
-		ctx.JSON(http.StatusOK, service.GetDeptById(uint(deptId)))
+		utils.ResultSuccess(ctx, service.GetDeptById(uint(deptId)))
 	}
 }
 

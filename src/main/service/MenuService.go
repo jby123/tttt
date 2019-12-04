@@ -28,6 +28,7 @@ func FindMenuByPage(name, order, sort string, pageNum, pageSize int) (page *data
 }
 
 func FindMenuListByParam(searchMap map[string]interface{}) (err error, resultDataList []*model.SysMenu) {
+	resultDataList = make([]*model.SysMenu, 0)
 	err = database.FindListByParam(searchMap, &resultDataList)
 	if err == nil {
 		return nil, resultDataList

@@ -91,7 +91,7 @@ func GetDB() *gorm.DB {
 type SearchMap map[string]interface{}
 
 func FindCommPage(searchMap map[string]interface{}, order, sort string, offset, limit int, resultDataList interface{}) (page *PaginationVo) {
-	err := FindPage(searchMap, sort, sort, offset, limit).Find(&resultDataList).Error
+	err := FindPage(searchMap, sort, sort, offset, limit).Find(resultDataList).Error
 	if err != nil {
 		return Pagination(resultDataList, offset, limit, 0)
 	}
@@ -125,10 +125,12 @@ func FindPage(searchMap map[string]interface{}, order, sort string, offset, limi
 		client = client.Where(searchSql, searchArgs...)
 	}
 	if len(sort) <= 0 {
-		sort = "desc"
+		sort = "DESC"
 	}
 	if len(order) <= 0 {
 		order = "create_time"
+	} else {
+		//order = strings.
 	}
 	client = client.Order(" " + order + " " + sort + " ")
 	if offset > 0 {
@@ -144,7 +146,7 @@ func FindListByParam(searchMap map[string]interface{}, resultDataList interface{
 	searchSql, searchArgs := ParseSearchMap(searchMap)
 	client := GetDB()
 	if len(searchSql) > 0 {
-		client = client.Where(searchSql, searchArgs)
+		client = client.Where(searchSql, searchArgs...)
 	}
 	if err := client.Find(resultDataList).Error; err != nil {
 		fmt.Printf("FindListByParam.Err:%s\n", err)

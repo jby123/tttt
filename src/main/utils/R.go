@@ -17,17 +17,17 @@ func ResultError(ctx *gin.Context, status int, message string, data interface{})
 
 func Success(objects interface{}) map[string]interface{} {
 	return gin.H{
-		"status": SuccessCode,
-		"msg":    SuccessMessage,
-		"data":   objects,
+		"code":    SuccessCode,
+		"message": SuccessMessage,
+		"data":    objects,
 	}
 }
 
 func Error(status int, message string, data interface{}) map[string]interface{} {
 	return gin.H{
-		"status": status,
-		"msg":    message,
-		"data":   data,
+		"code":    status,
+		"message": message,
+		"data":    data,
 	}
 }
 

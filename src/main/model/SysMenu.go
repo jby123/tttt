@@ -15,7 +15,7 @@ type SysMenu struct {
 	KeepAlive uint      `gorm:"column:keep_alive" json:"keepAlive"`
 	OrderNum  uint      `gorm:"column:order_num" json:"orderNum"`
 	ViewPath  string    `gorm:"column:view_path" json:"viewPath"`
-	Router    string    `gorm:"column:url" json:"url" "not null VARCHAR(50)"`
+	Router    string    `gorm:"column:url" json:"router"`
 	Perms     string    `gorm:"column:perms" json:"perms"`
 	Status    uint      `gorm:"column:status" json:"status"`
 	Remark    string    `gorm:"column:remark" json:"remark"`

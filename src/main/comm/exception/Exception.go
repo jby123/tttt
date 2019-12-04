@@ -50,6 +50,6 @@ func TokenExpiredException() {
  * 登入账号异常
  */
 func LoginAccountException() {
-	model := Model{Code: 1000, Message: "account.or.password.exception"}
+	model := Model{Code: utils.BUSINESS_ERROR, Message: "account.or.password.exception"}
 	panic(model)
 }

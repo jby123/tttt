@@ -18,7 +18,8 @@ func FindRoleByPage(name, order, sort string, pageNum, pageSize int) (page *data
 	searchMap := make(map[string]interface{})
 	searchMap["name"] = name
 	var resultDataList []*model.SysRole
-	if err := database.FindPage(searchMap, sort, sort, pageNum, pageSize).Find(&resultDataList).Error; err != nil {
+
+	if err := database.FindPage(searchMap, order, sort, pageNum, pageSize).Find(&resultDataList).Error; err != nil {
 		fmt.Printf("FindRoleByPage.Error:%s\n", err)
 		return database.Pagination(resultDataList, pageNum, pageSize, 0)
 	}

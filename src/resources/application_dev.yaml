@@ -1,3 +1,6 @@
+Iris:
+  BasePath: /admin
+
 Cache:
   NetWork: tcp
   Host: 127.0.0.1
