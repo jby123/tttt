@@ -93,7 +93,7 @@ type SearchMap map[string]interface{}
 func FindCommPage(searchMap map[string]interface{}, order, sort string, offset, limit int, resultDataList interface{}) (page *PaginationVo) {
 	err := FindPage(searchMap, sort, sort, offset, limit).Find(resultDataList).Error
 	if err != nil {
-		return Pagination(resultDataList, offset, limit, 0)
+		return Pagination(make([]interface{}, 0), offset, limit, 0)
 	}
 	var resultData interface{}
 	switch resultDataValues := resultDataList.(type) {
@@ -130,7 +130,7 @@ func FindPage(searchMap map[string]interface{}, order, sort string, offset, limi
 	if len(order) <= 0 {
 		order = "create_time"
 	} else {
-		//order = strings.
+		order = CamelCase(order)
 	}
 	client = client.Order(" " + order + " " + sort + " ")
 	if offset > 0 {
