@@ -2,6 +2,7 @@ package routers
 
 import (
 	"github.com/gin-gonic/gin"
+	"goAdmin/src/main/comm/config"
 	"goAdmin/src/main/comm/middleware"
 	"goAdmin/src/main/controller"
 	"goAdmin/src/main/utils"
@@ -23,8 +24,12 @@ func RegisterRoute(application *gin.Engine) {
 	// register 404 NotFound
 	application.NoRoute(middleware.GlobalNoRouteHandler)
 
+	baseRelativePath := config.CommConfig.Iris.BasePath
+	if len(baseRelativePath) == 0 {
+		baseRelativePath = "/"
+	}
 	//1 路由组 api/admin
-	route := application.Group("/api/admin")
+	route := application.Group(baseRelativePath)
 
 	//1-1 路由组 api/admin/comm 公共业务网块
 	comm := route.Group("/comm")

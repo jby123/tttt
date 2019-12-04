@@ -41,7 +41,7 @@ func GetMenu() gin.HandlerFunc {
 			ctx.JSON(http.StatusOK, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
 			return
 		}
-		ctx.JSON(http.StatusOK, service.GetMenuById(uint(menuId)))
+		utils.ResultSuccess(ctx, service.GetMenuById(uint(menuId)))
 	}
 }
 

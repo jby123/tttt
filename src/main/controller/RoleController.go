@@ -33,7 +33,7 @@ func ListRoles() gin.HandlerFunc {
 func GetRole() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		roleId := request.ParseRequestId(ctx)
-		ctx.JSON(http.StatusOK, service.GetRoleById(uint(roleId)))
+		utils.ResultSuccess(ctx, service.GetRoleById(uint(roleId)))
 	}
 }
 

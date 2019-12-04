@@ -24,7 +24,7 @@ func PageDic() gin.HandlerFunc {
 func GetDic() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		dicId := request.ParseRequestId(ctx)
-		ctx.JSON(http.StatusOK, service.GetDicById(uint(dicId)))
+		utils.ResultSuccess(ctx, service.GetDicById(uint(dicId)))
 	}
 }
 

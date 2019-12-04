@@ -39,7 +39,7 @@ func Captcha() gin.HandlerFunc {
 			IsShowNoiseText:    false,
 			IsShowSlimeLine:    false,
 			IsShowSineLine:     false,
-			CaptchaLen:         6,
+			CaptchaLen:         4,
 		}
 		captchaId, digitCap := base64Captcha.GenerateCaptcha(postParameters.Id, config)
 		base64Png := base64Captcha.CaptchaWriteToBase64Encoding(digitCap)
