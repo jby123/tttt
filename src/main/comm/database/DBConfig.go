@@ -176,7 +176,6 @@ func Count(searchMap map[string]interface{}, model interface{}) int {
 func GetById(id uint, model interface{}) error {
 	client := GetDB()
 	if err := client.Where("id = ?", id).First(model).Error; err != nil {
-		fmt.Printf("GetById.Err:%s\n", err)
 		return err
 	}
 	return nil
@@ -185,11 +184,11 @@ func GetById(id uint, model interface{}) error {
 func DeleteById(id uint, model interface{}) error {
 	client := GetDB()
 	if err := client.Where("id = ?", id).Delete(model).Error; err != nil {
-		fmt.Printf("DeleteById.Err:%s\n", err)
 		return err
 	}
 	return nil
 }
+
 func DeleteByIds(ids []int, model interface{}) error {
 	client := GetDB()
 	if err := client.Where("id in (?)", ids).Delete(model).Error; err != nil {
@@ -201,7 +200,6 @@ func DeleteByIds(ids []int, model interface{}) error {
 func Create(model interface{}) error {
 	client := GetDB()
 	if err := client.Create(model).Error; err != nil {
-		fmt.Printf("Create.Err:%s\n", err)
 		return err
 	}
 	return nil
@@ -210,7 +208,6 @@ func Create(model interface{}) error {
 func Update(model interface{}) error {
 	client := GetDB()
 	if err := client.Update(model).Error; err != nil {
-		fmt.Printf("Update.Err:%s\n", err)
 		return err
 	}
 	return nil
@@ -219,7 +216,6 @@ func Update(model interface{}) error {
 func UpdateById(id uint, model interface{}) error {
 	client := GetDB()
 	if err := client.Where("id = ?", id).Update(model).Error; err != nil {
-		fmt.Printf("Update.Err:%s\n", err)
 		return err
 	}
 	return nil

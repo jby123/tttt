@@ -24,6 +24,7 @@ func RegisterRoute(application *gin.Engine) {
 	// register 404 NotFound
 	application.NoRoute(middleware.GlobalNoRouteHandler)
 
+	//动态全局配置URL请求路径
 	baseRelativePath := config.CommConfig.Iris.BasePath
 	if len(baseRelativePath) == 0 {
 		baseRelativePath = "/"

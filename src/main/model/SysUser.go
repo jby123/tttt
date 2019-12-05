@@ -10,6 +10,7 @@ type SysUser struct {
 	UpdatedAt    time.Time `gorm:"column:update_time" json:"updateTime" "not null VARCHAR(191)"`
 	Name         string    `gorm:"column:name" json:"name" "not null VARCHAR(191)"`
 	Username     string    `gorm:"column:username" json:"username" "not null VARCHAR(191)"`
+	NickName     string    `gorm:"column:nick_name" json:"nickName"`
 	Password     string    `gorm:"column:password" json:"password" "not null VARCHAR(191)"` //md5加密
 	Phone        string    `gorm:"column:phone" json:"phone"`
 	Email        string    `gorm:"column:email" json:"email"`
@@ -25,6 +26,7 @@ type SysUserVo struct {
 	UpdatedAt      time.Time `json:"updateTime"`
 	Name           string    `json:"name"`
 	Username       string    `json:"username"`
+	NickName       string    `json:"nickName"`
 	Password       string    `json:"password"` //md5加密
 	Phone          string    `json:"phone"`
 	Email          string    `json:"email"`
