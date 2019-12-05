@@ -26,7 +26,7 @@ type SysUserVo struct {
 	UpdatedAt      time.Time `json:"updateTime"`
 	Name           string    `json:"name"`
 	Username       string    `json:"username"`
-	NickName       string    `json:"nickName"`
+	NickName     string      `json:"nickName"`
 	Password       string    `json:"password"` //md5加密
 	Phone          string    `json:"phone"`
 	Email          string    `json:"email"`
