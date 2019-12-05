@@ -3,6 +3,8 @@ package controller
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/rocket049/gostructcopy"
+	"goAdmin/src/main/comm/exception"
 	"goAdmin/src/main/controller/vo/req"
 	"goAdmin/src/main/model"
 	"goAdmin/src/main/service"
@@ -70,14 +72,25 @@ func GetUser() gin.HandlerFunc {
  */
 func CreateUser() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var sysUser model.SysUser
-		error := ctx.BindJSON(&sysUser)
+		var srcReqUser req.SysUserReq
+		error := ctx.BindJSON(&srcReqUser)
 		if error != nil {
 			fmt.Printf("CreateUser.bind.error.%s \n", error)
 			ctx.JSON(http.StatusOK, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
 			return
 		}
-		service.CreateUser(&sysUser)
+		targetSysUser := model.SysUser{}
+		err := gostructcopy.StructCopy(srcReqUser, targetSysUser)
+		if err != nil {
+			exception.SystemException(err.Error())
+		}
+		//保存用户信息
+		service.CreateUser(&targetSysUser)
+		if srcReqUser.RoleId > 0 {
+			//保存用户与角色的关系
+			userRole := model.SysUserRole{RoleId: srcReqUser.RoleId, UserId: targetSysUser.ID}
+			service.SaveOrUpdateUserRole(&userRole)
+		}
 		ctx.JSON(http.StatusOK, utils.Success(nil))
 	}
 }
@@ -96,14 +109,25 @@ func CreateUser() gin.HandlerFunc {
  */
 func UpdateUser() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var sysUser model.SysUser
-		error := ctx.BindJSON(&sysUser)
+		var srcReqUser req.SysUserReq
+		error := ctx.BindJSON(&srcReqUser)
 		if error != nil {
 			fmt.Printf("CreateUser.bind.error.%s \n", error)
 			ctx.JSON(http.StatusOK, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
 			return
 		}
-		service.UpdateUser(&sysUser)
+		targetSysUser := model.SysUser{}
+		err := gostructcopy.StructCopy(srcReqUser, targetSysUser)
+		if err != nil {
+			exception.SystemException(err.Error())
+		}
+
+		service.UpdateUser(&targetSysUser)
+		if srcReqUser.RoleId > 0 {
+			//保存用户与角色的关系
+			userRole := model.SysUserRole{RoleId: srcReqUser.RoleId, UserId: targetSysUser.ID}
+			service.SaveOrUpdateUserRole(&userRole)
+		}
 		ctx.JSON(http.StatusOK, utils.Success(nil))
 	}
 }

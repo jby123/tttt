@@ -16,6 +16,7 @@ require (
 	github.com/mattn/go-sqlite3 v2.0.0+incompatible // indirect
 	github.com/mojocn/base64Captcha v0.0.0-20190801020520-752b1cd608b2
 	github.com/robfig/cron v1.2.0
+	github.com/rocket049/gostructcopy v0.0.1
 	github.com/steambap/svg-captcha v1.4.0 // indirect
 	github.com/swaggo/swag v1.6.3 // indirect
 	github.com/ugorji/go v1.1.7 // indirect

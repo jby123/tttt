@@ -63,7 +63,7 @@ func CreateRole(sysRole *model.SysRole) error {
  * @param  {[type]} sysRole model.SysRole    [description]
  */
 func UpdateRole(sysRole *model.SysRole) error {
-	err := database.Update(sysRole)
+	err := database.UpdateById(sysRole.ID, &sysRole)
 	if err != nil {
 		return err
 	}

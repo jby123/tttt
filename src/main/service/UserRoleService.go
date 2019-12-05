@@ -15,3 +15,16 @@ func FindUserRoleListById(id uint) ([]*model.SysUserRole, error) {
 	}
 	return resultDataList, nil
 }
+
+func SaveOrUpdateUserRole(userRole *model.SysUserRole) {
+	var resultDataList []*model.SysUserRole
+	err := database.FindListByParam(database.SearchMap{"user_id": userRole.UserId, "role_id": userRole.RoleId}, &resultDataList)
+	if err != nil {
+		return
+	}
+	if len(resultDataList) > 0 {
+		return
+	}
+	database.Create(userRole)
+
+}
