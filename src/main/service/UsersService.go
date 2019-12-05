@@ -140,7 +140,7 @@ func UpdateUser(sysUser *model.SysUser) error {
 
 	sysUser.Password = utils.EncodeMD5(sysUser.Password)
 
-	err := database.UpdateById(sysUser.ID, sysUser)
+	err := database.UpdateById(sysUser.ID, &sysUser)
 	if err != nil {
 		return err
 	}
