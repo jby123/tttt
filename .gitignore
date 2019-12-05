@@ -1,5 +1,6 @@
 /.idea
 /log/
+/log/goAdmin-access.log
 /logs/
 /view/.vscode
 /view/node_modules/
