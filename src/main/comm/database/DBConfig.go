@@ -198,6 +198,7 @@ func DeleteByIds(ids []int, model interface{}) error {
 }
 func DeleteByParams(searchMap map[string]interface{}, model interface{}) error {
 	client := GetDB()
+	client = client.Model(model)
 	searchSql, searchArgs := ParseSearchMap(searchMap)
 	if len(searchSql) > 0 {
 		client = client.Where(searchSql, searchArgs...)
@@ -218,6 +219,7 @@ func Create(model interface{}) error {
 
 func Update(model interface{}) error {
 	client := GetDB()
+	client = client.Model(model)
 	if err := client.Update(model).Error; err != nil {
 		return err
 	}
@@ -226,6 +228,7 @@ func Update(model interface{}) error {
 
 func UpdateById(id uint, model interface{}) error {
 	client := GetDB()
+	client = client.Model(model)
 	if err := client.Where("id = ?", id).Update(model).Error; err != nil {
 		return err
 	}

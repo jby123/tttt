@@ -71,13 +71,20 @@ func UpdateRole(sysRole *model.SysRole) error {
 }
 
 func DeleteRoleById(id uint) {
+
+	//删除角色对应的菜单
+	searchMap := make(map[string]interface{})
+	searchMap["role_id"] = id
+	DeleteRoleMenuByParams(searchMap)
+	//删除用户跟角色的关系
+	DeleteUserRoleByRoleId(id)
+	//删除角色跟部门关系
+	DeleteRoleDeptByRoleId(id)
+	//删除角色信息
 	u := new(model.SysRole)
 	err := database.DeleteById(id, u)
 	if err != nil {
 		return
 	}
-	searchMap := make(map[string]interface{})
-	searchMap["role_id"] = id
-	DeleteRoleMenuByParams(searchMap)
 
 }

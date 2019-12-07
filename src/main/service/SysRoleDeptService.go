@@ -2,6 +2,7 @@ package service
 
 import (
 	"goAdmin/src/main/comm/database"
+	"goAdmin/src/main/comm/exception"
 	"goAdmin/src/main/model"
 )
 
@@ -10,7 +11,7 @@ func SaveOrUpdateRoleDeptBatch(roleId uint, deptIds []uint) {
 		return
 	}
 
-	var resultDataList []*model.SysUserRole
+	var resultDataList []*model.SysRoleDept
 	err := database.FindListByParam(database.SearchMap{"dept_id": deptIds, "role_id": roleId}, &resultDataList)
 	if err != nil {
 		return
@@ -24,7 +25,15 @@ func SaveOrUpdateRoleDeptBatch(roleId uint, deptIds []uint) {
 
 	for _, deptId := range deptIds {
 		roleDept := model.SysRoleDept{RoleId: roleId, DeptId: deptId}
-		_ = database.Create(roleDept)
+
+		err = database.Create(roleDept)
+		if err != nil {
+			exception.SystemException("系统异常." + err.Error())
+		}
 	}
 
+}
+
+func DeleteRoleDeptByRoleId(roleId uint) {
+	database.DeleteByParams(database.SearchMap{"role_id": roleId}, model.SysRoleDept{})
 }

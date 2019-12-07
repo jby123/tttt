@@ -40,6 +40,7 @@ func startAdminApplication() (app *gin.Engine) {
 			&model.SysMenu{},
 			&model.SysRoleMenu{},
 			&model.SysUserRole{},
+			&model.SysRoleDept{},
 		)
 	}
 

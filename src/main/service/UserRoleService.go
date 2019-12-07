@@ -26,5 +26,11 @@ func SaveOrUpdateUserRole(userRole *model.SysUserRole) {
 		return
 	}
 	database.Create(userRole)
+}
 
+func DeleteUserRoleByRoleId(roleId uint) {
+	database.DeleteByParams(database.SearchMap{"role_id": roleId}, model.SysUserRole{})
+}
+func DeleteUserRoleByUserId(userId uint) {
+	database.DeleteByParams(database.SearchMap{"user_id": userId}, model.SysUserRole{})
 }
