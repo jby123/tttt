@@ -73,9 +73,7 @@ func UpdateRole(sysRole *model.SysRole) error {
 func DeleteRoleById(id uint) {
 
 	//删除角色对应的菜单
-	searchMap := make(map[string]interface{})
-	searchMap["role_id"] = id
-	DeleteRoleMenuByParams(searchMap)
+	DeleteRoleMenuByRoleId(id)
 	//删除用户跟角色的关系
 	DeleteUserRoleByRoleId(id)
 	//删除角色跟部门关系

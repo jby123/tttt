@@ -3,7 +3,10 @@ package service
 import (
 	"fmt"
 	"goAdmin/src/main/comm/database"
+	"goAdmin/src/main/comm/exception"
 	"goAdmin/src/main/model"
+	"goAdmin/src/main/utils"
+	"strings"
 )
 
 /**
@@ -35,12 +38,24 @@ func GetDicById(id uint) (resultData *model.SysDic) {
 	return resultData
 }
 
+func GetDicByName(name string) *model.SysDic {
+	sysDic := new(model.SysDic)
+	_ = database.FindListByParam(database.SearchMap{"name": database.Condition{Operate: database.Equals, Value: name}}, sysDic)
+	return sysDic
+}
+
 /**
  * 创建
  * @method CreateParam
  * @param  {[type]} dic model.SysDic    [description]
  */
 func CreateDic(dic *model.SysDic) error {
+
+	sysDic := model.SysDic{}
+	isExist := database.Count(database.SearchMap{"name": database.Condition{Operate: database.Equals, Value: dic.Name}}, &sysDic)
+	if isExist > 0 {
+		exception.BusinessException(utils.BUSINESS_ERROR, "dic.exist")
+	}
 	err := database.Create(dic)
 	if err != nil {
 		return err
@@ -54,6 +69,15 @@ func CreateDic(dic *model.SysDic) error {
  * @param  {[type]} dic model.SysDic    [description]
  */
 func UpdateDic(dic *model.SysDic) error {
+
+	dbDic := GetDicById(dic.ID)
+	isExit := dbDic != nil && !strings.EqualFold(dbDic.Name, dic.Name)
+	if isExit {
+		isExist := database.Count(database.SearchMap{"name": database.Condition{Operate: database.Equals, Value: dic.Name}}, &model.SysDic{})
+		if isExist > 0 {
+			exception.BusinessException(utils.BUSINESS_ERROR, "dic.exist")
+		}
+	}
 	err := database.Update(dic)
 	if err != nil {
 		return err

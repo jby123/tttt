@@ -77,8 +77,6 @@ func DeleteMenuById(id uint) {
 	if err != nil {
 		return
 	}
-	searchMap := make(map[string]interface{})
-	searchMap["menu_id"] = id
-	DeleteRoleMenuByParams(searchMap)
+	DeleteRoleMenuByMenuId(id)
 
 }

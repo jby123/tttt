@@ -54,7 +54,18 @@ func ListUsers() gin.HandlerFunc {
 func GetUser() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		userId := request.ParseRequestId(ctx)
-		utils.ResultSuccess(ctx, service.GetUserById(uint(userId)))
+		userInfo := service.GetUserById(uint(userId))
+		if userInfo == nil {
+			utils.ResultSuccess(ctx, nil)
+		}
+		targetSysUser := model.SysUserVo{}
+		err := gostructcopy.StructCopy(&userInfo, &targetSysUser)
+		if err != nil {
+			exception.SystemException(err.Error())
+		}
+		roleIds := service.FindRoleIdListByUserId(uint(userId))
+		targetSysUser.RoleIdList = roleIds
+		utils.ResultSuccess(ctx, targetSysUser)
 	}
 }
 
@@ -80,7 +91,7 @@ func CreateUser() gin.HandlerFunc {
 			return
 		}
 		targetSysUser := model.SysUser{}
-		err := gostructcopy.StructCopy(srcReqUser, targetSysUser)
+		err := gostructcopy.StructCopy(&srcReqUser, &targetSysUser)
 		if err != nil {
 			exception.SystemException(err.Error())
 		}
@@ -117,7 +128,7 @@ func UpdateUser() gin.HandlerFunc {
 			return
 		}
 		targetSysUser := model.SysUser{}
-		err := gostructcopy.StructCopy(srcReqUser, targetSysUser)
+		err := gostructcopy.StructCopy(&srcReqUser, &targetSysUser)
 		if err != nil {
 			exception.SystemException(err.Error())
 		}
@@ -148,4 +159,22 @@ func DeleteUser() gin.HandlerFunc {
 		service.DeleteUserByIds(ids)
 		ctx.JSON(http.StatusOK, utils.Success(nil))
 	}
+}
+
+func MoveUser() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var moveUserReq req.MoveUserReq
+		error := ctx.BindJSON(&moveUserReq)
+		if error != nil {
+			ctx.JSON(http.StatusOK, utils.Error(utils.BUSINESS_ERROR, "数据参数有误", nil))
+			return
+		}
+
+		for _, userId := range moveUserReq.UserIds {
+			targetSysUser := model.SysUser{ID: userId, DepartmentId: moveUserReq.DepartmentId}
+			_ = service.UpdateUser(&targetSysUser)
+		}
+		ctx.JSON(http.StatusOK, utils.Success(nil))
+	}
+
 }

@@ -18,7 +18,7 @@ import (
 func FindDeptByPage(name, order, sort string, pageNum, pageSize int) (page *database.PaginationVo) {
 	searchMap := make(map[string]interface{})
 	searchMap["name"] = name
-	var resultDataList []*model.SysDepartment
+	var resultDataList []model.SysDepartment
 	return database.FindCommPage(searchMap, order, sort, pageNum, pageSize, &resultDataList)
 }
 

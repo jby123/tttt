@@ -7,6 +7,7 @@ const DefaultDevelopmentRelativePath = "./src/resources"
 const DefaultTestRelativePath = "E:\\go_project\\goAdmin\\src\\test\\resources"
 const DefaultDevelopmentEnv = "dev"
 
+const DefaultPassword = "123456"
 const DefaultCaptchaLen = 4
 
 const DEFAULT_EXPIRE_SECOND_TIME = time.Duration(30) * time.Second
@@ -24,3 +25,7 @@ const SYSTEM_MESSAGE string = "UNKNOWN.ERROR"
 
 // 日志文件
 const AppAccessLogName = "log/" + AppName + "-access.log"
+
+const DicByLogKeepKey = "LOG_KEEP_SAVE_DAY_KEY"
+
+const DicByLogKeepValue int = 30 //日志默认保存30天

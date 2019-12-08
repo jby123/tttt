@@ -95,3 +95,11 @@ INSERT INTO `sys_role_menu` ( `role_id`, `menu_id`) VALUES (1, 34);
 INSERT INTO `sys_role_menu` ( `role_id`, `menu_id`) VALUES (1, 35);
 INSERT INTO `sys_role_menu` ( `role_id`, `menu_id`) VALUES (1, 36);
 
+
+
+-- 新增 菜单 用户转移部门
+INSERT INTO `sys_menu`
+(`id`, `create_time`, `update_time`, `parent_id`, `name`, `url`, `perms`,`type`, `icon`, `order_num`, `view_path`, `keep_alive`)
+VALUES
+ (36, '2019-11-26 23:50:13.059599', '2019-11-26 23:50:13.059599', 8, '用户转移', NULL, 'sys:user:move', 2, NULL, 0, NULL, 1);
+

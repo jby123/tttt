@@ -104,6 +104,9 @@ func FindCommPage(searchMap map[string]interface{}, order, sort string, offset, 
 		}
 	}
 	total := Count(searchMap, resultData)
+	if total <= 0 {
+		return Pagination(make([]interface{}, 0), offset, limit, 0)
+	}
 	return Pagination(resultDataList, offset, limit, total)
 }
 
@@ -149,7 +152,10 @@ func FindListByParam(searchMap map[string]interface{}, resultDataList interface{
 		client = client.Where(searchSql, searchArgs...)
 	}
 	if err := client.Find(resultDataList).Error; err != nil {
-		fmt.Printf("FindListByParam.Err:%s\n", err)
+		if err == gorm.ErrRecordNotFound {
+			// do something
+			return nil
+		}
 		return err
 	}
 	return nil
@@ -165,6 +171,7 @@ func Count(searchMap map[string]interface{}, model interface{}) int {
 
 	var total int = 0
 	client.Count(&total)
+
 	return total
 }
 
@@ -242,6 +249,30 @@ func ParseSearchMap(searchMap map[string]interface{}) (string, []interface{}) {
 	for searchKey, searchValue := range searchMap {
 		if len(searchKey) > 0 {
 			switch vv := searchValue.(type) {
+			case Condition:
+				if len(querySql) == 0 {
+					querySql += " " + searchKey
+				} else {
+					querySql += " AND " + searchKey
+				}
+				if vv.Operate == Equals {
+					querySql += " =  ? "
+					queryArgs = append(queryArgs, vv.Value)
+				} else if vv.Operate == Like {
+					querySql += " LIKE  ? "
+
+					queryArgs = append(queryArgs, "%"+vv.Value+"%")
+				} else if vv.Operate == LeftLike {
+					querySql += " LIKE  ? "
+					queryArgs = append(queryArgs, "%"+vv.Value+"%")
+				} else if vv.Operate == RightLike {
+					querySql += " LIKE  ? "
+					queryArgs = append(queryArgs, ""+vv.Value+"%")
+				} else {
+					querySql += " LIKE  ? "
+					queryArgs = append(queryArgs, "%"+vv.Value+"%")
+				}
+
 			case string:
 				if len(vv) > 0 {
 					if len(querySql) == 0 {

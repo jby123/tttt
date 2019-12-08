@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"goAdmin/src/main/comm/database"
 	"goAdmin/src/main/model"
 )
@@ -19,10 +18,16 @@ func FindLogByPage(name, order, sort string, pageNum, pageSize int) (page *datab
 	searchMap := make(map[string]interface{})
 	searchMap["name"] = name
 	var resultDataList []*model.SysLog
-	if err := database.FindPage(searchMap, sort, sort, pageNum, pageSize).Find(&resultDataList).Error; err != nil {
-		fmt.Printf("FindLogByPage.Error:%s\n", err)
-		return database.Pagination(resultDataList, pageNum, pageSize, 0)
+	if err := database.FindPage(searchMap, order, sort, pageNum, pageSize).Find(&resultDataList).Error; err != nil {
+		return database.Pagination(make([]interface{}, 0), pageNum, pageSize, 0)
 	}
 	total := database.Count(searchMap, &model.SysLog{})
-	return database.Pagination(resultDataList, pageNum, pageSize, total)
+	if total > 0 {
+		return database.Pagination(resultDataList, pageNum, pageSize, total)
+	}
+	return database.Pagination(make([]interface{}, 0), pageNum, pageSize, 0)
+}
+
+func DeleteLogsAll() {
+	database.DeleteByParams(nil, &model.SysLog{})
 }

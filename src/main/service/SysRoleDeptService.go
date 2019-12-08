@@ -2,38 +2,39 @@ package service
 
 import (
 	"goAdmin/src/main/comm/database"
-	"goAdmin/src/main/comm/exception"
 	"goAdmin/src/main/model"
 )
+
+func FindDeptIdListByRoleId(roleId uint) ([]uint, error) {
+	var deptIds = make([]uint, 0)
+	var roleDeptList []*model.SysRoleDept
+	err := database.FindListByParam(database.SearchMap{"role_id": roleId}, &roleDeptList)
+	if err != nil {
+		return deptIds, err
+	}
+	if len(roleDeptList) <= 0 {
+		return deptIds, nil
+	}
+	for _, roleDept := range roleDeptList {
+		deptIds = append(deptIds, roleDept.DeptId)
+	}
+	return deptIds, nil
+}
 
 func SaveOrUpdateRoleDeptBatch(roleId uint, deptIds []uint) {
 	if len(deptIds) <= 0 {
 		return
 	}
-
-	var resultDataList []*model.SysRoleDept
-	err := database.FindListByParam(database.SearchMap{"dept_id": deptIds, "role_id": roleId}, &resultDataList)
-	if err != nil {
+	if roleId <= 0 {
 		return
 	}
-	if len(resultDataList) > 0 {
-		return
-	}
-	for _, roleDept := range resultDataList {
-		database.DeleteById(roleDept.ID, model.SysRoleDept{})
-	}
-
+	DeleteRoleDeptByRoleId(roleId)
 	for _, deptId := range deptIds {
 		roleDept := model.SysRoleDept{RoleId: roleId, DeptId: deptId}
-
-		err = database.Create(roleDept)
-		if err != nil {
-			exception.SystemException("系统异常." + err.Error())
-		}
+		_ = database.Create(&roleDept)
 	}
-
 }
 
 func DeleteRoleDeptByRoleId(roleId uint) {
-	database.DeleteByParams(database.SearchMap{"role_id": roleId}, model.SysRoleDept{})
+	database.DeleteByParams(database.SearchMap{"role_id": roleId}, &model.SysRoleDept{})
 }

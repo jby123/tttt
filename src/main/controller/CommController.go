@@ -4,9 +4,13 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/mojocn/base64Captcha"
+	"github.com/xinliangnote/go-util/uuid"
+	"goAdmin/src/main/comm/exception"
 	"goAdmin/src/main/controller/vo"
 	"goAdmin/src/main/utils"
+	"io"
 	"net/http"
+	"os"
 	"strconv"
 )
 
@@ -66,6 +70,31 @@ func VerifyCaptcha() gin.HandlerFunc {
 		} else {
 			ctx.JSON(http.StatusOK, utils.Error(utils.SYSTEM_ERROR_CODE, "验证码错误", nil))
 		}
+	}
+}
+
+func FileUpload() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		//得到上传的文件
+		file, header, err := ctx.Request.FormFile("file") //image这个是uplaodify参数定义中的   'fileObjName':'image'
+		if err != nil {
+			ctx.String(http.StatusBadRequest, "Bad request")
+			return
+		}
+		//文件的名称
+		reFileName := uuid.GenUUID() + header.Filename
+		//创建文件
+		out, err := os.Create("static/upload_file/" + reFileName)
+		//注意此处的 static/upload_file/ 不是/static/upload_file/
+		if err != nil {
+			exception.SystemException("upload.file.error" + err.Error())
+		}
+		defer out.Close()
+		_, err = io.Copy(out, file)
+		if err != nil {
+			exception.SystemException("upload.file.error" + err.Error())
+		}
+		ctx.JSON(http.StatusOK, utils.Success("static/upload_file/"+reFileName))
 	}
 }
 

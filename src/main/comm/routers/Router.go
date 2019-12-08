@@ -39,7 +39,7 @@ func RegisterRoute(application *gin.Engine) {
 		comm.POST("/login", controller.Login())    //登入
 		comm.GET("/captcha", controller.Captcha()) //获取验证码
 		//comm.GET("/verifyCaptcha", controller.VerifyCaptcha()) //验证-验证码
-
+		comm.POST("/upload", controller.FileUpload()) //文件上传
 		//登入后 获取  [需要校验token]
 		comm.GET("/permmenu", middleware.AuthTokenHandler(), controller.CurrentAuthorizationMenus())
 		comm.GET("/person", middleware.AuthTokenHandler(), controller.CurrentUserInfo())               //当前用户信息
@@ -53,6 +53,9 @@ func RegisterRoute(application *gin.Engine) {
 	{
 		log := sys.Group("/log")
 		log.GET("/page", middleware.AuthorizationHandler(utils.PermsLogPage), controller.PageLogs())
+		log.POST("/clear", middleware.AuthorizationHandler(utils.PermsLogClear), controller.ClearLogs())
+		log.POST("/set-keep", middleware.AuthorizationHandler(utils.PermsLogSetKeep), controller.SetKeepLog())
+		log.GET("/get-keep", middleware.AuthorizationHandler(utils.PermsLogGetKeep), controller.GetKeepLog())
 	}
 	//用户api
 	{
@@ -63,6 +66,7 @@ func RegisterRoute(application *gin.Engine) {
 		user.POST("/add", middleware.AuthorizationHandler(utils.PermsUserCreate), controller.CreateUser())
 		user.POST("/update", middleware.AuthorizationHandler(utils.PermsUserUpdate), controller.UpdateUser())
 		user.POST("/delete", middleware.AuthorizationHandler(utils.PermsUserDelete), controller.DeleteUser())
+		user.POST("/move", middleware.AuthorizationHandler(utils.PermsUserMove), controller.MoveUser())
 	}
 	//角色 api
 	{

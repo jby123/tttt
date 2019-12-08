@@ -22,7 +22,7 @@ import (
  */
 func FindUserByPage(departmentIds []int, name, order, sort string, pageNum, pageSize int) (page *database.PaginationVo) {
 
-	var resultDataList []*model.SysUserVo
+	var resultDataList []model.SysUserVo
 
 	//1.統計
 	searchMap := make(map[string]interface{})
@@ -30,7 +30,7 @@ func FindUserByPage(departmentIds []int, name, order, sort string, pageNum, page
 	searchMap["department_id"] = departmentIds
 	total := database.Count(searchMap, &model.SysUser{})
 	if total == 0 {
-		return database.Pagination(resultDataList, pageNum, pageSize, 0)
+		return database.Pagination(make([]interface{}, 0), pageNum, pageSize, 0)
 	}
 	queryArgs := make([]interface{}, 0)
 	var sql string = ` SELECT u.*, GROUP_CONCAT(r.name) AS role_name, d.name AS department_name `
@@ -57,9 +57,9 @@ func FindUserByPage(departmentIds []int, name, order, sort string, pageNum, page
 	err := database.GetDB().Raw(sql, queryArgs...).Scan(&resultDataList).Error
 	if err != nil {
 		fmt.Printf("FindByPage.Error:%s\n", err)
-		return database.Pagination(resultDataList, pageNum, pageSize, 0)
+		return database.Pagination(make([]interface{}, 0), pageNum, pageSize, 0)
 	}
-	return database.Pagination(resultDataList, pageNum, pageSize, total)
+	return database.Pagination(&resultDataList, pageNum, pageSize, total)
 }
 
 func FindUserCount(departmentId int, name string) int {
@@ -123,6 +123,9 @@ func DeleteUserByIds(ids []int) error {
  * @param  {[type]} sysUser model.SysUser [description]
  */
 func CreateUser(sysUser *model.SysUser) error {
+	if len(sysUser.Password) == 0 {
+		sysUser.Password = utils.DefaultPassword
+	}
 	sysUser.Password = utils.EncodeMD5(sysUser.Password)
 	err := database.Create(sysUser)
 	if err != nil {
@@ -137,7 +140,9 @@ func CreateUser(sysUser *model.SysUser) error {
  * @param  {[type]} sysUser model.SysUser [description]
  */
 func UpdateUser(sysUser *model.SysUser) error {
-
+	if len(sysUser.Password) == 0 {
+		sysUser.Password = utils.DefaultPassword
+	}
 	sysUser.Password = utils.EncodeMD5(sysUser.Password)
 
 	err := database.UpdateById(sysUser.ID, &sysUser)

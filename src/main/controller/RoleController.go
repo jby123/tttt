@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rocket049/gostructcopy"
 	"goAdmin/src/main/comm/exception"
+	"goAdmin/src/main/controller/vo"
 	"goAdmin/src/main/controller/vo/req"
 	"goAdmin/src/main/model"
 	"goAdmin/src/main/service"
@@ -35,7 +36,24 @@ func ListRoles() gin.HandlerFunc {
 func GetRole() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		roleId := request.ParseRequestId(ctx)
-		utils.ResultSuccess(ctx, service.GetRoleById(uint(roleId)))
+		roleInfo := service.GetRoleById(uint(roleId))
+
+		if roleInfo != nil {
+			menuIds, _ := service.FindMenuIdListByRoleId(uint(roleId))
+			deptIds, _ := service.FindDeptIdListByRoleId(uint(roleId))
+			targetRoleInfo := vo.SysRoleVo{
+				ID:               roleInfo.ID,
+				Status:           roleInfo.Status,
+				Name:             roleInfo.Name,
+				Remark:           roleInfo.Remark,
+				Code:             roleInfo.Code,
+				MenuIdList:       menuIds,
+				DepartmentIdList: deptIds,
+			}
+			utils.ResultSuccess(ctx, targetRoleInfo)
+			return
+		}
+		utils.ResultSuccess(ctx, nil)
 	}
 }
 

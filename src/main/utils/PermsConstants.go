@@ -7,6 +7,7 @@ const (
 	PermsUserCreate = "sys:user:create"
 	PermsUserUpdate = "sys:user:update"
 	PermsUserDelete = "sys:user:delete"
+	PermsUserMove   = "sys:user:move"
 
 	PermsRolePage   = "sys:role:page"
 	PermsRoleList   = "sys:role:list"
@@ -29,5 +30,8 @@ const (
 	PermsDepartmentUpdate = "sys:dept:update"
 	PermsDepartmentDelete = "sys:dept:delete"
 
-	PermsLogPage = "sys:log:page"
+	PermsLogPage    = "sys:log:page"
+	PermsLogClear   = "sys:log:clear"
+	PermsLogSetKeep = "sys:log:set-keep"
+	PermsLogGetKeep = "sys:log:get-keep"
 )
