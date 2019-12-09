@@ -3,15 +3,20 @@ module goAdmin
 go 1.13
 
 require (
+	github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a // indirect
+	github.com/axetroy/gin-uploader v0.0.0-20171129094815-727c504833e7 // indirect
+	github.com/axetroy/go-fs v1.0.0 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.4.0
 	github.com/go-redis/redis v6.15.6+incompatible
+	github.com/google/uuid v1.1.1 // indirect
 	github.com/jinzhu/gorm v1.9.11
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/mattn/go-isatty v0.0.8 // indirect
 	github.com/mattn/go-sqlite3 v2.0.1+incompatible // indirect
 	github.com/mojocn/base64Captcha v0.0.0-20190801020520-752b1cd608b2
+	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
 	github.com/robfig/cron v1.2.0
 	github.com/rocket049/gostructcopy v0.0.1
 	github.com/ugorji/go v1.1.7 // indirect
