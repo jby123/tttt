@@ -1,7 +1,7 @@
 # goAdmin
 
 #### 介绍
-gin + jwt +vue  权限框架
+gin + gorm + jwt + vue  权限框架
 
 #### 软件架构
 
