@@ -18,7 +18,9 @@ DB:
 
 #验证
 Valid:
+  #是否开启验证码校验
   IsLoginValidCaptcha: false
+  #是否开启权限校验
   IsOpenAuthorization: false
 
 #通知
