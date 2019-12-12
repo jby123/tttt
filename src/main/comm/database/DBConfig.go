@@ -39,7 +39,12 @@ func InitDB(activeEnv string, dbConfig *DbConfig) (err error) {
 	if len(activeEnv) != 0 && activeEnv == DefaultDevelopmentEnv {
 		dbClient.LogMode(true)
 	}
+	//SetMaxOpenConns用于设置最大打开的连接数
+	//SetMaxIdleConns用于设置闲置的连接数
+
+	//设置闲置的连接数
 	dbClient.DB().SetMaxIdleConns(dbConfig.Db.MaxIdle)
+	//设置最大打开的连接数
 	dbClient.DB().SetMaxOpenConns(dbConfig.Db.MaxOpen)
 	dbClient.DB().SetConnMaxLifetime(time.Duration(30) * time.Minute) //心跳時間設置為MySQL的一半
 	//注册 db回调钩子操作
