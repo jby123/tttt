@@ -120,7 +120,7 @@ func DeleteUserByParams(searchMap map[string]interface{}) {
  * @method DeleteUserById
  */
 func DeleteUserById(id uint) error {
-	_ := database.DeleteById(id, &model.SysUser{})
+	_ = database.DeleteById(id, &model.SysUser{})
 	_, _ = cache.Delete(fmt.Sprintf(utils.CacheUserKey, id))
 	return nil
 }
@@ -129,7 +129,7 @@ func DeleteUserByIds(ids []int) error {
 	if len(ids) <= 0 {
 		return nil
 	}
-	_ := database.DeleteByIds(ids, &model.SysUser{})
+	_ = database.DeleteByIds(ids, &model.SysUser{})
 	for id := range ids {
 		_, _ = cache.Delete(fmt.Sprintf(utils.CacheUserKey, id))
 	}
