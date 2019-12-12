@@ -87,11 +87,11 @@ func GetUserById(id uint) *model.SysUser {
 		if !flag {
 			return nil
 		}
-		value, _ := json.Marshal(model)
+		value, _ := json.Marshal(&model)
 		cache.Set(fmt.Sprintf(utils.CacheUserKey, id), string(value), utils.DEFAULT_EXPIRE_DAY_TIME)
 	} else {
 		//添加缓存
-		_ = json.Unmarshal([]byte(value), model)
+		_ = json.Unmarshal([]byte(value), &model)
 	}
 
 	return model

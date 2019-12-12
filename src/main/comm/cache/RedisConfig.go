@@ -3,6 +3,7 @@ package cache
 import (
 	"fmt"
 	"github.com/go-redis/redis"
+	"goAdmin/src/main/comm/exception"
 	"time"
 )
 
@@ -33,6 +34,11 @@ func InitRedis(conf *RedisConfig) (err error) {
 			IdleTimeout: time.Duration(30) * time.Minute,
 		})
 
+	err = redisClient.Ping().Err()
+	if err != nil {
+		fmt.Println("redis.ping.error.", err)
+		exception.CacheException(err)
+	}
 	redisClient.WrapProcess(func(old func(cmd redis.Cmder) error) func(cmd redis.Cmder) error {
 		return func(cmd redis.Cmder) error {
 			fmt.Printf("starting process:<%s>\n", cmd)

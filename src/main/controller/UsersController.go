@@ -58,8 +58,8 @@ func GetUser() gin.HandlerFunc {
 		if userInfo == nil {
 			utils.ResultSuccess(ctx, nil)
 		}
-		targetSysUser := model.SysUserVo{}
-		err := gostructcopy.StructCopy(&userInfo, &targetSysUser)
+		targetSysUser := &model.SysUserVo{}
+		err := gostructcopy.StructCopy(userInfo, targetSysUser)
 		if err != nil {
 			exception.SystemException(err.Error())
 		}
