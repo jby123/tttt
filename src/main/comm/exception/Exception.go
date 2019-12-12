@@ -8,6 +8,11 @@ type Model struct {
 	args    []interface{} `json:"args"`
 }
 
+func CacheException(err error) {
+	model := Model{Code: 500, Message: err.Error()}
+	panic(model)
+}
+
 /**
  * 业务异常
  */

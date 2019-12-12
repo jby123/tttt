@@ -29,3 +29,9 @@ const AppAccessLogName = "log/" + AppName + "-access.log"
 const DicByLogKeepKey = "LOG_KEEP_SAVE_DAY_KEY"
 
 const DicByLogKeepValue int = 30 //日志默认保存30天
+
+//缓存数据参数
+const (
+	CacheIpKey   = "biz:ip:all"
+	CacheUserKey = "biz_user:%d"
+)

@@ -1,14 +1,13 @@
 package cache
 
 import (
-	"fmt"
+	"goAdmin/src/main/comm/exception"
 	"time"
 )
 
 func errHandler(err error) {
 	if err != nil {
-		fmt.Printf("err_handler, error:%s\n", err.Error())
-		panic(err.Error())
+		exception.CacheException(err)
 	}
 
 }
@@ -24,7 +23,7 @@ func Set(key, val string, ttl time.Duration) error {
 func Get(key string) (string, error) {
 	value, error := redisClient.Get(key).Result()
 	errHandler(error)
-	if error != nil {
+	if len(value) <= 0 {
 		return "", error
 	}
 	return value, error

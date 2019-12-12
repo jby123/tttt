@@ -1,7 +1,9 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
+	"goAdmin/src/main/comm/cache"
 	"goAdmin/src/main/comm/database"
 	"goAdmin/src/main/comm/exception"
 	"goAdmin/src/main/model"
@@ -78,10 +80,20 @@ func FindUserCount(departmentId int, name string) int {
  */
 func GetUserById(id uint) *model.SysUser {
 	model := &model.SysUser{}
-	_, flag := database.GetById(id, &model)
-	if !flag {
-		return nil
+	//获取缓存
+	value, _ := cache.Get(fmt.Sprintf(utils.CacheUserKey, id))
+	if len(value) <= 0 {
+		_, flag := database.GetById(id, model)
+		if !flag {
+			return nil
+		}
+		value, _ := json.Marshal(model)
+		cache.Set(fmt.Sprintf(utils.CacheUserKey, id), string(value), utils.DEFAULT_EXPIRE_DAY_TIME)
+	} else {
+		//添加缓存
+		_ = json.Unmarshal([]byte(value), model)
 	}
+
 	return model
 }
 
@@ -108,11 +120,20 @@ func DeleteUserByParams(searchMap map[string]interface{}) {
  * @method DeleteUserById
  */
 func DeleteUserById(id uint) error {
-	return database.DeleteById(id, &model.SysUser{})
+	_ := database.DeleteById(id, &model.SysUser{})
+	_, _ = cache.Delete(fmt.Sprintf(utils.CacheUserKey, id))
+	return nil
 }
 
 func DeleteUserByIds(ids []int) error {
-	return database.DeleteByIds(ids, &model.SysUser{})
+	if len(ids) <= 0 {
+		return nil
+	}
+	_ := database.DeleteByIds(ids, &model.SysUser{})
+	for id := range ids {
+		_, _ = cache.Delete(fmt.Sprintf(utils.CacheUserKey, id))
+	}
+	return nil
 }
 
 /**
@@ -147,6 +168,7 @@ func UpdateUser(sysUser *model.SysUser) error {
 	if err != nil {
 		return err
 	}
+	_, _ = cache.Delete(fmt.Sprintf(utils.CacheUserKey, sysUser.ID))
 	return nil
 }
 
