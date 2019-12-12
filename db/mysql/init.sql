@@ -1,3 +1,8 @@
+
+-- 系统字典参数
+INSERT INTO `sys_dic` (`id`, `create_time`, `update_time`, `parent_id`, `name`, `value`, `status`, `remark`) VALUES (1, '2019-12-9 00:08:10', '2019-12-9 00:08:10', 0, 'LOG_KEEP_SAVE_DAY_KEY', '30', 1, '默认日志保存天数');
+
+
 -- 初始化部门
 INSERT INTO `sys_department` (`id`, `create_time`, `update_time`, `name`, `parent_id`, `status`, `order_num`, `remark`) VALUES (1, '2019-12-5 09:54:32', '2019-12-5 09:54:37', '部门1', 0, 1, 0, NULL);
 INSERT INTO `sys_department` (`id`, `create_time`, `update_time`, `name`, `parent_id`, `status`, `order_num`, `remark`) VALUES (2, '2019-12-5 09:54:35', '2019-12-5 09:54:41', '部门1-1', 1, 1, 0, NULL);
