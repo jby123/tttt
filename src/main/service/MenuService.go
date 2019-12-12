@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"goAdmin/src/main/comm/database"
 	"goAdmin/src/main/model"
 )
@@ -15,16 +14,17 @@ import (
  * @param  {[type]} pageNum int    [description]
  * @param  {[type]} pageSize int    [description]
  */
-func FindMenuByPage(name, order, sort string, pageNum, pageSize int) (page *database.PaginationVo) {
-	searchMap := make(map[string]interface{})
-	searchMap["name"] = name
-	var resultDataList []*model.SysMenu
-	if err := database.FindPage(searchMap, sort, sort, pageNum, pageSize).Find(&resultDataList).Error; err != nil {
-		fmt.Printf("FindLogByPage.Error:%s\n", err)
-		return database.Pagination(resultDataList, pageNum, pageSize, 0)
+func FindMenuByPage(name, order, sort string, pageNum, pageSize int) *database.PaginationVo {
+	resultDataList := &[]model.SysMenu{}
+	model := &model.SysMenu{}
+	requestPage := &database.Page{
+		Model:          model,
+		SearchMap:      database.SearchMap{"name": name},
+		ResultDataList: resultDataList,
+		Pagination:     &database.PageInfo{Page: pageNum, Size: pageSize, Order: order, Sort: sort},
 	}
-	total := database.Count(searchMap, &model.SysMenu{})
-	return database.Pagination(resultDataList, pageNum, pageSize, total)
+	return database.FindCommPage(requestPage)
+
 }
 
 func FindMenuListByParam(searchMap map[string]interface{}) (err error, resultDataList []*model.SysMenu) {
@@ -36,13 +36,13 @@ func FindMenuListByParam(searchMap map[string]interface{}) (err error, resultDat
 	return err, resultDataList
 }
 
-func GetMenuById(id uint) (resultData *model.SysMenu) {
-	resultData = new(model.SysMenu)
-	err := database.GetById(id, resultData)
-	if err != nil {
-		fmt.Printf("GetMenuById.error.%s\n", err)
+func GetMenuById(id uint) *model.SysMenu {
+	model := &model.SysMenu{}
+	_, flag := database.GetById(id, &model)
+	if !flag {
+		return nil
 	}
-	return resultData
+	return model
 }
 
 /**
@@ -72,11 +72,13 @@ func UpdateMenu(sysMenu *model.SysMenu) error {
 }
 
 func DeleteMenuById(id uint) {
-	u := new(model.SysMenu)
-	err := database.DeleteById(id, u)
+	err := database.DeleteById(id, &model.SysMenu{})
 	if err != nil {
 		return
 	}
+	/**
+	 * 清除角色与 菜单的关系
+	 */
 	DeleteRoleMenuByMenuId(id)
 
 }

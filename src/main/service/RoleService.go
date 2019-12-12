@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"goAdmin/src/main/comm/database"
 	"goAdmin/src/main/model"
 )
@@ -14,34 +13,30 @@ import (
  * @param  {[type]} pageNum int    [description]
  * @param  {[type]} pageSize int    [description]
  */
-func FindRoleByPage(name, order, sort string, pageNum, pageSize int) (page *database.PaginationVo) {
-	searchMap := make(map[string]interface{})
-	searchMap["name"] = name
-	var resultDataList []*model.SysRole
-
-	if err := database.FindPage(searchMap, order, sort, pageNum, pageSize).Find(&resultDataList).Error; err != nil {
-		fmt.Printf("FindRoleByPage.Error:%s\n", err)
-		return database.Pagination(resultDataList, pageNum, pageSize, 0)
+func FindRoleByPage(name, order, sort string, pageNum, pageSize int) *database.PaginationVo {
+	requestPage := &database.Page{
+		Model:          &model.SysRole{},
+		SearchMap:      database.SearchMap{"name": name},
+		ResultDataList: &[]model.SysRole{},
+		Pagination:     &database.PageInfo{Page: pageNum, Size: pageSize, Order: order, Sort: sort},
 	}
-	total := database.Count(searchMap, &model.SysRole{})
-	return database.Pagination(resultDataList, pageNum, pageSize, total)
+	return database.FindCommPage(requestPage)
+
 }
 
-func FindRoleListByParam(searchMap map[string]interface{}) (err error, resultDataList []*model.SysRole) {
-	err = database.FindListByParam(searchMap, &resultDataList)
-	if err == nil {
-		return nil, resultDataList
-	}
-	return err, resultDataList
+func FindRoleListByParam(searchMap map[string]interface{}) *[]model.SysRole {
+	resultDataList := &[]model.SysRole{}
+	_ = database.FindListByParam(searchMap, resultDataList)
+	return resultDataList
 }
 
-func GetRoleById(id uint) (resultData *model.SysRole) {
-	resultData = new(model.SysRole)
-	err := database.GetById(id, resultData)
-	if err != nil {
-		fmt.Printf("GetRoleById.error.%s\n", err)
+func GetRoleById(id uint) *model.SysRole {
+	model := &model.SysRole{}
+	_, flag := database.GetById(id, &model)
+	if !flag {
+		return nil
 	}
-	return resultData
+	return model
 }
 
 /**
@@ -71,7 +66,6 @@ func UpdateRole(sysRole *model.SysRole) error {
 }
 
 func DeleteRoleById(id uint) {
-
 	//删除角色对应的菜单
 	DeleteRoleMenuByRoleId(id)
 	//删除用户跟角色的关系
@@ -79,8 +73,7 @@ func DeleteRoleById(id uint) {
 	//删除角色跟部门关系
 	DeleteRoleDeptByRoleId(id)
 	//删除角色信息
-	u := new(model.SysRole)
-	err := database.DeleteById(id, u)
+	err := database.DeleteById(id, &model.SysRole{})
 	if err != nil {
 		return
 	}

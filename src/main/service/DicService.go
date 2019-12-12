@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"goAdmin/src/main/comm/database"
 	"goAdmin/src/main/comm/exception"
 	"goAdmin/src/main/model"
@@ -17,31 +16,32 @@ import (
  * @param  {[type]} pageNum int    [description]
  * @param  {[type]} pageSize int    [description]
  */
-func FindDicByPage(name, order, sort string, pageNum, pageSize int) (page *database.PaginationVo) {
-	searchMap := make(map[string]interface{})
-	searchMap["name"] = name
-	var resultDataList []*model.SysDic
-	if err := database.FindPage(searchMap, sort, sort, pageNum, pageSize).Find(&resultDataList).Error; err != nil {
-		fmt.Printf("FindDicByPage.Error:%s\n", err)
-		return database.Pagination(resultDataList, pageNum, pageSize, 0)
+func FindDicByPage(name, order, sort string, pageNum, pageSize int) *database.PaginationVo {
+	resultDataList := &[]model.SysDic{}
+	model := &model.SysDic{}
+	requestPage := &database.Page{
+		Model:          model,
+		SearchMap:      database.SearchMap{"name": name},
+		ResultDataList: resultDataList,
+		Pagination:     &database.PageInfo{Page: pageNum, Size: pageSize, Order: order, Sort: sort},
 	}
-	total := database.Count(searchMap, &model.SysDic{})
-	return database.Pagination(resultDataList, pageNum, pageSize, total)
+	return database.FindCommPage(requestPage)
+
 }
 
-func GetDicById(id uint) (resultData *model.SysDic) {
-	resultData = new(model.SysDic)
-	err := database.GetById(id, resultData)
-	if err != nil {
-		fmt.Printf("GetDicById.error.%s\n", err)
+func GetDicById(id uint) *model.SysDic {
+	model := &model.SysDic{}
+	_, flag := database.GetById(id, &model)
+	if !flag {
+		return nil
 	}
-	return resultData
+	return model
 }
 
 func GetDicByName(name string) *model.SysDic {
-	sysDic := new(model.SysDic)
-	_ = database.FindListByParam(database.SearchMap{"name": database.Condition{Operate: database.Equals, Value: name}}, sysDic)
-	return sysDic
+	model := &model.SysDic{}
+	_ = database.FindListByParam(database.SearchMap{"name": database.Condition{Operate: database.Equals, Value: name}}, model)
+	return model
 }
 
 /**
@@ -51,8 +51,7 @@ func GetDicByName(name string) *model.SysDic {
  */
 func CreateDic(dic *model.SysDic) error {
 
-	sysDic := model.SysDic{}
-	isExist := database.Count(database.SearchMap{"name": database.Condition{Operate: database.Equals, Value: dic.Name}}, &sysDic)
+	isExist := database.Count(database.SearchMap{"name": database.Condition{Operate: database.Equals, Value: dic.Name}}, &model.SysDic{})
 	if isExist > 0 {
 		exception.BusinessException(utils.BUSINESS_ERROR, "dic.exist")
 	}
@@ -86,6 +85,5 @@ func UpdateDic(dic *model.SysDic) error {
 }
 
 func DeleteDicById(id uint) {
-	param := new(model.SysDic)
-	database.DeleteById(id, param)
+	database.DeleteById(id, &model.SysDic{})
 }

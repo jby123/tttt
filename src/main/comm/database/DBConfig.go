@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"goAdmin/src/main/comm/exception"
 	"os"
 	"time"
 )
@@ -90,24 +91,22 @@ func GetDB() *gorm.DB {
 
 type SearchMap map[string]interface{}
 
-func FindCommPage(searchMap map[string]interface{}, order, sort string, offset, limit int, resultDataList interface{}) (page *PaginationVo) {
-	err := FindPage(searchMap, sort, sort, offset, limit).Find(resultDataList).Error
+func FindCommPage(page *Page) *PaginationVo {
+
+	err := FindPage(page.SearchMap, page.Pagination.Order, page.Pagination.Sort, page.Pagination.Page, page.Pagination.Size).Find(page.ResultDataList).Error
 	if err != nil {
-		return Pagination(make([]interface{}, 0), offset, limit, 0)
-	}
-	var resultData interface{}
-	switch resultDataValues := resultDataList.(type) {
-	case []interface{}:
-		for _, v := range resultDataValues {
-			resultData = v
-			break
+		if err == gorm.ErrRecordNotFound {
+			return Pagination(make([]interface{}, 0), page.Pagination.Page, page.Pagination.Size, 0)
 		}
+		fmt.Println("findCommPage.error....>>>", err)
+		return Pagination(make([]interface{}, 0), page.Pagination.Page, page.Pagination.Size, 0)
 	}
-	total := Count(searchMap, resultData)
+
+	total := Count(page.SearchMap, page.Model)
 	if total <= 0 {
-		return Pagination(make([]interface{}, 0), offset, limit, 0)
+		return Pagination(make([]interface{}, 0), page.Pagination.Page, page.Pagination.Size, 0)
 	}
-	return Pagination(resultDataList, offset, limit, total)
+	return Pagination(page.ResultDataList, page.Pagination.Page, page.Pagination.Size, total)
 }
 
 /**
@@ -180,17 +179,26 @@ func Count(searchMap map[string]interface{}, model interface{}) int {
  * @method GetById
  * @param  {[type]} model interface{} [description]
  */
-func GetById(id uint, model interface{}) error {
+func GetById(id uint, model interface{}) (error, bool) {
 	client := GetDB()
 	if err := client.Where("id = ?", id).First(model).Error; err != nil {
-		return err
+		if err != nil {
+			if err == gorm.ErrRecordNotFound {
+				return nil, false
+			}
+			exception.SystemException(err.Error())
+		}
 	}
-	return nil
+	return nil, true
 }
 
 func DeleteById(id uint, model interface{}) error {
 	client := GetDB()
 	if err := client.Where("id = ?", id).Delete(model).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			// do something
+			return nil
+		}
 		return err
 	}
 	return nil
@@ -199,6 +207,10 @@ func DeleteById(id uint, model interface{}) error {
 func DeleteByIds(ids []int, model interface{}) error {
 	client := GetDB()
 	if err := client.Where("id in (?)", ids).Delete(model).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			// do something
+			return nil
+		}
 		return err
 	}
 	return nil
@@ -211,6 +223,10 @@ func DeleteByParams(searchMap map[string]interface{}, model interface{}) error {
 		client = client.Where(searchSql, searchArgs...)
 	}
 	if err := client.Delete(model).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			// do something
+			return nil
+		}
 		return err
 	}
 	return nil

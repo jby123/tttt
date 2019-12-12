@@ -49,6 +49,13 @@ INSERT INTO `sys_menu`(`id`, `create_time`, `update_time`, `parent_id`, `name`, 
 INSERT INTO `sys_menu`(`id`, `create_time`, `update_time`, `parent_id`, `name`, `url`, `perms`,`type`, `icon`, `order_num`, `view_path`, `keep_alive`) VALUES (35, '2019-11-26 23:50:13.059599', '2019-11-26 23:50:13.059599', 34, '记录', NULL, 'sys:info:record', 2, NULL, 0, NULL, 1);
 
 
+-- 新增 菜单 用户转移部门
+INSERT INTO `sys_menu`
+(`id`, `create_time`, `update_time`, `parent_id`, `name`, `url`, `perms`,`type`, `icon`, `order_num`, `view_path`, `keep_alive`)
+VALUES
+ (36, '2019-11-26 23:50:13.059599', '2019-11-26 23:50:13.059599', 8, '用户转移', NULL, 'sys:user:move', 2, NULL, 0, NULL, 1);
+
+
 -- 初始化角色
 INSERT INTO `sys_role` (`id`, `create_time`, `update_time`, `name`, `status`, `remark`) VALUES (1, '2019-12-5 09:30:30', '2019-12-5 09:30:38', '超级管理员', 1, '超级管理员');
 
@@ -96,10 +103,4 @@ INSERT INTO `sys_role_menu` ( `role_id`, `menu_id`) VALUES (1, 35);
 INSERT INTO `sys_role_menu` ( `role_id`, `menu_id`) VALUES (1, 36);
 
 
-
--- 新增 菜单 用户转移部门
-INSERT INTO `sys_menu`
-(`id`, `create_time`, `update_time`, `parent_id`, `name`, `url`, `perms`,`type`, `icon`, `order_num`, `view_path`, `keep_alive`)
-VALUES
- (36, '2019-11-26 23:50:13.059599', '2019-11-26 23:50:13.059599', 8, '用户转移', NULL, 'sys:user:move', 2, NULL, 0, NULL, 1);
 

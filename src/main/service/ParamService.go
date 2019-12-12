@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"goAdmin/src/main/comm/database"
 	"goAdmin/src/main/model"
 )
@@ -14,25 +13,26 @@ import (
  * @param  {[type]} pageNum int    [description]
  * @param  {[type]} pageSize int    [description]
  */
-func FindParamByPage(name, order, sort string, pageNum, pageSize int) (page *database.PaginationVo) {
-	searchMap := make(map[string]interface{})
-	searchMap["name"] = name
-	var resultDataList []*model.SysParam
-	if err := database.FindPage(searchMap, sort, sort, pageNum, pageSize).Find(&resultDataList).Error; err != nil {
-		fmt.Printf("FindParamByPage.Error:%s\n", err)
-		return database.Pagination(resultDataList, pageNum, pageSize, 0)
+func FindParamByPage(name, order, sort string, pageNum, pageSize int) *database.PaginationVo {
+	resultDataList := &[]model.SysParam{}
+	model := &model.SysParam{}
+	requestPage := &database.Page{
+		Model:          model,
+		SearchMap:      database.SearchMap{"name": name},
+		ResultDataList: resultDataList,
+		Pagination:     &database.PageInfo{Page: pageNum, Size: pageSize, Order: order, Sort: sort},
 	}
-	total := database.Count(searchMap, &model.SysParam{})
-	return database.Pagination(resultDataList, pageNum, pageSize, total)
+	return database.FindCommPage(requestPage)
+
 }
 
-func GetParamById(id uint) (resultData *model.SysParam) {
-	resultData = new(model.SysParam)
-	err := database.GetById(id, resultData)
-	if err != nil {
-		fmt.Printf("GetParamById.error.%s\n", err)
+func GetParamById(id uint) *model.SysParam {
+	model := &model.SysParam{}
+	_, flag := database.GetById(id, &model)
+	if !flag {
+		return nil
 	}
-	return resultData
+	return model
 }
 
 /**

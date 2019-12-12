@@ -28,7 +28,7 @@ func PageRoles() gin.HandlerFunc {
 func ListRoles() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		searchMap := make(map[string]interface{})
-		_, resultDataList := service.FindRoleListByParam(searchMap)
+		resultDataList := service.FindRoleListByParam(searchMap)
 		ctx.JSON(http.StatusOK, utils.Success(resultDataList))
 	}
 }

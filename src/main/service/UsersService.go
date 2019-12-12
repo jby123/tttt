@@ -20,9 +20,9 @@ import (
  * @param  {[type]} pageNum int    [description]
  * @param  {[type]} pageSize int    [description]
  */
-func FindUserByPage(departmentIds []int, name, order, sort string, pageNum, pageSize int) (page *database.PaginationVo) {
+func FindUserByPage(departmentIds []int, name, order, sort string, pageNum, pageSize int) *database.PaginationVo {
 
-	var resultDataList []model.SysUserVo
+	resultDataList := &[]model.SysUserVo{}
 
 	//1.統計
 	searchMap := make(map[string]interface{})
@@ -54,12 +54,12 @@ func FindUserByPage(departmentIds []int, name, order, sort string, pageNum, page
 	limit := "limit " + strconv.Itoa(offset) + ", " + strconv.Itoa(pageSize) + ""
 	sql = strings.Replace(sql, "{filterLimit}", limit, -1)
 
-	err := database.GetDB().Raw(sql, queryArgs...).Scan(&resultDataList).Error
+	err := database.GetDB().Raw(sql, queryArgs...).Scan(resultDataList).Error
 	if err != nil {
 		fmt.Printf("FindByPage.Error:%s\n", err)
 		return database.Pagination(make([]interface{}, 0), pageNum, pageSize, 0)
 	}
-	return database.Pagination(&resultDataList, pageNum, pageSize, total)
+	return database.Pagination(resultDataList, pageNum, pageSize, total)
 }
 
 func FindUserCount(departmentId int, name string) int {
@@ -76,13 +76,13 @@ func FindUserCount(departmentId int, name string) int {
  * @method GetUserById
  * @param  {[type]}       user  *SysUser [description]
  */
-func GetUserById(id uint) (user *model.SysUser) {
-	user = new(model.SysUser)
-	err := database.GetById(id, user)
-	if err != nil {
-		fmt.Printf("getUserById.error.%s\n", err)
+func GetUserById(id uint) *model.SysUser {
+	model := &model.SysUser{}
+	_, flag := database.GetById(id, &model)
+	if !flag {
+		return nil
 	}
-	return user
+	return model
 }
 
 /**
@@ -91,12 +91,12 @@ func GetUserById(id uint) (user *model.SysUser) {
  * @param  {[type]}       user  *SysUser [description]
  */
 func GetUserByUserName(username string) (*model.SysUser, bool, error) {
-	user := &model.SysUser{}
-	if err := database.GetDB().Where("username = ?", username).First(user).Error; err != nil {
+	model := &model.SysUser{}
+	if err := database.GetDB().Where("username = ?", username).First(model).Error; err != nil {
 		return nil, false, err
 	}
 
-	return user, true, nil
+	return model, true, nil
 }
 
 func DeleteUserByParams(searchMap map[string]interface{}) {
@@ -108,13 +108,11 @@ func DeleteUserByParams(searchMap map[string]interface{}) {
  * @method DeleteUserById
  */
 func DeleteUserById(id uint) error {
-	u := new(model.SysUser)
-	return database.DeleteById(id, u)
+	return database.DeleteById(id, &model.SysUser{})
 }
 
 func DeleteUserByIds(ids []int) error {
-	u := new(model.SysUser)
-	return database.DeleteByIds(ids, u)
+	return database.DeleteByIds(ids, &model.SysUser{})
 }
 
 /**
@@ -145,24 +143,11 @@ func UpdateUser(sysUser *model.SysUser) error {
 	}
 	sysUser.Password = utils.EncodeMD5(sysUser.Password)
 
-	err := database.UpdateById(sysUser.ID, &sysUser)
+	err := database.UpdateById(sysUser.ID, sysUser)
 	if err != nil {
 		return err
 	}
 	return nil
-}
-
-/**
- * 校验用户登录
- * @method checkLogin
- * @param  {[type]}       username string [description]
- */
-func checkLogin(username string) model.SysUser {
-	u := model.SysUser{}
-	if err := database.GetDB().Where("username = ?", username).First(&u).Error; err != nil {
-		fmt.Printf("checkLogin.Err:%s", err)
-	}
-	return u
 }
 
 /**
@@ -171,8 +156,8 @@ func checkLogin(username string) model.SysUser {
  * @param  {[type]}  id       int    [description]
  * @param  {[type]}  password string [description]
  */
-func Login(username, password string) (status bool, user *model.SysUser, err error) {
-	user, status, err = GetUserByUserName(username)
+func Login(username, password string) (bool, *model.SysUser, error) {
+	user, status, err := GetUserByUserName(username)
 	if !status {
 		exception.LoginAccountException()
 	} else {

@@ -6,9 +6,11 @@ type PaginationVo struct {
 }
 
 type PageInfo struct {
-	Page  int `json:"page"`
-	Size  int `json:"size"`
-	Total int `json:"total"`
+	Page  int    `json:"page"`
+	Size  int    `json:"size"`
+	Total int    `json:"total"`
+	Order string `json:"order"`
+	Sort  string `json:"sort"`
 }
 
 /**
@@ -17,8 +19,8 @@ type PageInfo struct {
 type Page struct {
 	SearchMap      map[string]interface{} //查询条件 interface 可以是直接的值 也可以是 Condition条件
 	Model          interface{}            //查询表的实体model
-	resultDataList interface{}            //返回结果集
-	Page           *PageInfo              //分页请求参数
+	ResultDataList interface{}            //返回结果集
+	Pagination     *PageInfo              //分页请求参数
 }
 
 func Pagination(resultDataList interface{}, pageNum, pageSize, total int) *PaginationVo {

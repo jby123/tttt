@@ -16,16 +16,17 @@ import (
  * @param  {[type]} pageNum int    [description]
  * @param  {[type]} pageSize int    [description]
  */
-func FindIpByPage(name, order, sort string, pageNum, pageSize int) (page *database.PaginationVo) {
-	searchMap := make(map[string]interface{})
-	searchMap["ip"] = name
-	var resultDataList []*model.SysIp
-	if err := database.FindPage(searchMap, sort, sort, pageNum, pageSize).Find(&resultDataList).Error; err != nil {
-		fmt.Printf("FindIpByPage.Error:%s\n", err)
-		return database.Pagination(resultDataList, pageNum, pageSize, 0)
+func FindIpByPage(name, order, sort string, pageNum, pageSize int) *database.PaginationVo {
+	resultDataList := &[]model.SysIp{}
+	model := &model.SysIp{}
+	requestPage := &database.Page{
+		Model:          model,
+		SearchMap:      database.SearchMap{"ip": name},
+		ResultDataList: resultDataList,
+		Pagination:     &database.PageInfo{Page: pageNum, Size: pageSize, Order: order, Sort: sort},
 	}
-	total := database.Count(searchMap, &model.SysIp{})
-	return database.Pagination(resultDataList, pageNum, pageSize, total)
+	return database.FindCommPage(requestPage)
+
 }
 
 func FindIpList(ipType int) (sysIp []*model.SysIp) {
@@ -41,13 +42,11 @@ func FindIpList(ipType int) (sysIp []*model.SysIp) {
  * @param  {[type]}       sysIp * model.SysIp [description]
  */
 func GetIpById(id uint) *model.SysIp {
-	sysIp := new(model.SysIp)
-	sysIp.ID = id
-	if err := database.GetDB().First(sysIp).Error; err != nil {
+	model := &model.SysIp{}
+	if err := database.GetDB().Where("id = ?", id).First(model).Error; err != nil {
 		fmt.Printf("GetIpById.Err:%s", err)
 	}
-
-	return sysIp
+	return model
 }
 
 /**
@@ -56,13 +55,11 @@ func GetIpById(id uint) *model.SysIp {
  * @param  {[type]}       sysIp * model.SysIp [description]
  */
 func GetByIp(ip string) *model.SysIp {
-	sysIp := new(model.SysIp)
-	sysIp.Ip = ip
-	if err := database.GetDB().First(sysIp).Error; err != nil {
+	model := &model.SysIp{}
+	if err := database.GetDB().Where("ip = ?", ip).First(model).Error; err != nil {
 		fmt.Printf("GetByIp.Err:%s", err)
 	}
-
-	return sysIp
+	return model
 }
 
 /**
@@ -70,11 +67,8 @@ func GetByIp(ip string) *model.SysIp {
  * @method DeleteIpById
  */
 func DeleteIpById(id uint) {
-	sysIp := new(model.SysIp)
-	sysIp.ID = id
-	if err := database.GetDB().Delete(sysIp).Error; err != nil {
-		fmt.Printf("DeleteIpById.Err:%s", err)
-	}
+	model := &model.SysIp{}
+	database.DeleteById(id, model)
 }
 
 /**

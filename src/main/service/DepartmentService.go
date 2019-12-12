@@ -15,11 +15,16 @@ import (
  * @param  {[type]} pageNum int    [description]
  * @param  {[type]} pageSize int    [description]
  */
-func FindDeptByPage(name, order, sort string, pageNum, pageSize int) (page *database.PaginationVo) {
-	searchMap := make(map[string]interface{})
-	searchMap["name"] = name
-	var resultDataList []model.SysDepartment
-	return database.FindCommPage(searchMap, order, sort, pageNum, pageSize, &resultDataList)
+func FindDeptByPage(name, order, sort string, pageNum, pageSize int) *database.PaginationVo {
+	resultDataList := &[]model.SysDepartment{}
+	model := &model.SysDepartment{}
+	requestPage := &database.Page{
+		Model:          model,
+		SearchMap:      database.SearchMap{"name": name},
+		ResultDataList: resultDataList,
+		Pagination:     &database.PageInfo{Page: pageNum, Size: pageSize, Order: order, Sort: sort},
+	}
+	return database.FindCommPage(requestPage)
 }
 
 func FindDeptListByParam(searchMap map[string]interface{}) (err error, resultDataList []*model.SysDepartment) {
@@ -30,13 +35,13 @@ func FindDeptListByParam(searchMap map[string]interface{}) (err error, resultDat
 	return err, resultDataList
 }
 
-func GetDeptById(id uint) (resultData *model.SysDepartment) {
-	resultData = new(model.SysDepartment)
-	err := database.GetById(id, resultData)
-	if err != nil {
-		fmt.Printf("GetDeptById.error.%s\n", err)
+func GetDeptById(id uint) *model.SysDepartment {
+	model := &model.SysDepartment{}
+	_, flag := database.GetById(id, &model)
+	if !flag {
+		return nil
 	}
-	return resultData
+	return model
 }
 
 /**

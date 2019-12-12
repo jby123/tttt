@@ -14,18 +14,17 @@ import (
  * @param  {[type]} pageNum int    [description]
  * @param  {[type]} pageSize int    [description]
  */
-func FindLogByPage(name, order, sort string, pageNum, pageSize int) (page *database.PaginationVo) {
-	searchMap := make(map[string]interface{})
-	searchMap["name"] = name
-	var resultDataList []*model.SysLog
-	if err := database.FindPage(searchMap, order, sort, pageNum, pageSize).Find(&resultDataList).Error; err != nil {
-		return database.Pagination(make([]interface{}, 0), pageNum, pageSize, 0)
+func FindLogByPage(name, order, sort string, pageNum, pageSize int) *database.PaginationVo {
+	resultDataList := &[]model.SysLog{}
+	model := &model.SysLog{}
+	requestPage := &database.Page{
+		Model:          model,
+		SearchMap:      database.SearchMap{"name": name},
+		ResultDataList: resultDataList,
+		Pagination:     &database.PageInfo{Page: pageNum, Size: pageSize, Order: order, Sort: sort},
 	}
-	total := database.Count(searchMap, &model.SysLog{})
-	if total > 0 {
-		return database.Pagination(resultDataList, pageNum, pageSize, total)
-	}
-	return database.Pagination(make([]interface{}, 0), pageNum, pageSize, 0)
+	return database.FindCommPage(requestPage)
+
 }
 
 func DeleteLogsAll() {

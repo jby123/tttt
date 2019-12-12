@@ -11,36 +11,17 @@ import (
 	"testing"
 )
 
-func PreInit() {
+func TestFindDicPage(t *testing.T) {
 	//初始化环境配置
 	config.InitCommConfig(utils.DefaultTestRelativePath)
 	//初始化mysql
 	database.InitDB(config.Config.EnvConf.ActiveConf.Active, &config.DbConf)
-}
-func TestGetById(t *testing.T) {
-	PreInit()
-	user := service.GetUserById(1100)
 
-	data, err := json.Marshal(user)
-	if err != nil {
-		log.Fatalf("Json marshaling failed：%s", err)
-	}
-	fmt.Printf("%s\n", data)
-}
-
-func TestFindUserPage(t *testing.T) {
-	PreInit()
-	page := service.FindUserByPage([]int{1, 2}, "a", "", "", 1, 10)
+	page := service.FindDicByPage("", "", "", 1, 10)
 
 	data, err := json.Marshal(page)
 	if err != nil {
 		log.Fatalf("Json marshaling failed：%s", err)
 	}
 	fmt.Printf("%s\n", data)
-}
-
-func TestFindUserCount(t *testing.T) {
-	PreInit()
-	count := service.FindUserCount(0, "")
-	fmt.Printf("user.find.count:%d\n", count)
 }
