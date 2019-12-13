@@ -15,7 +15,7 @@ const DefaultDevelopmentEnv = "dev"
 //总配置
 type Conf struct {
 	ServerConf Server `yaml:"Server"`
-	EnvConf    Iris   `yaml:"Iris"`
+	EnvConf    Gin    `yaml:"Gin"`
 }
 
 //系统服务配置
@@ -23,7 +23,7 @@ type Server struct {
 	Port int `yaml:"Port"`
 }
 
-type Iris struct {
+type Gin struct {
 	ActiveConf Profiles `yaml:"Profiles"`
 }
 

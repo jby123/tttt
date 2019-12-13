@@ -1,6 +1,6 @@
 Server:
   Port: 7001
 
-Iris:
+Gin:
   Profiles:
     Active: dev
