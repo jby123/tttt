@@ -3,10 +3,10 @@ package comm
 type Conf struct {
 	Notify IsOpenNotify `yaml:"Notify"`
 	Valid  ValidConfig  `yaml:"Valid"`
-	Iris   IrisConf     `yaml:"Iris"`
+	Gin    GinConf      `yaml:"Gin"`
 }
 
-type IrisConf struct {
+type GinConf struct {
 	BasePath string `yaml:"BasePath"`
 }
 

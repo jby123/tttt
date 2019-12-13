@@ -25,7 +25,7 @@ func RegisterRoute(application *gin.Engine) {
 	application.NoRoute(middleware.GlobalNoRouteHandler)
 
 	//动态全局配置URL请求路径
-	baseRelativePath := config.CommConfig.Iris.BasePath
+	baseRelativePath := config.CommConfig.Gin.BasePath
 	if len(baseRelativePath) == 0 {
 		baseRelativePath = "/"
 	}

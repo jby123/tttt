@@ -35,4 +35,4 @@ gin + gorm + jwt + vue  权限框架
 #### 使用说明
 
 ###### 1.  启动 项目的main方法：   src/main/AdminApplication.go 
-###### 2.  接口访问根路径：        http://localhost:7001/${Iris.BasePath--为对应各个环境配置的基础地址}/${具体controller路由地址}
+###### 2.  接口访问根路径：        http://localhost:7001/${Gin.BasePath--为对应各个环境配置的基础地址}/${具体controller路由地址}
